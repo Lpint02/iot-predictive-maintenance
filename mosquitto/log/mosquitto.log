@@ -1,0 +1,39 @@
+1767010006: mosquitto version 2.0.22 starting
+1767010006: Config loaded from /mosquitto/config/mosquitto.conf.
+1767010006: Opening ipv4 listen socket on port 1883.
+1767010006: Opening ipv6 listen socket on port 1883.
+1767010006: mosquitto version 2.0.22 running
+1767010099: New connection from 172.18.0.6:51492 on port 1883.
+1767010099: New client connected from 172.18.0.6:51492 as Telegraf-Consumer-L46aq (p2, c1, k60).
+1767018011: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1767018011: mosquitto version 2.0.22 terminating
+1767018011: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1767018130: mosquitto version 2.0.22 starting
+1767018130: Config loaded from /mosquitto/config/mosquitto.conf.
+1767018130: Opening ipv4 listen socket on port 1883.
+1767018130: Opening ipv6 listen socket on port 1883.
+1767018130: mosquitto version 2.0.22 running
+1767018134: New connection from 172.18.0.6:36856 on port 1883.
+1767018135: New client connected from 172.18.0.6:36856 as Telegraf-Consumer-KGP9w (p2, c1, k60).
+1767019567: New connection from 172.18.0.3:48936 on port 1883.
+1767019567: New client connected from 172.18.0.3:48936 as nodered-client (p2, c1, k60).
+1767019930: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1767021731: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1767021772: Client Telegraf-Consumer-KGP9w disconnected.
+1767021775: New connection from 172.18.0.6:48796 on port 1883.
+1767021775: New client connected from 172.18.0.6:48796 as Telegraf-Consumer-V43ut (p2, c1, k60).
+1767021810: Client Telegraf-Consumer-V43ut disconnected.
+1767021813: New connection from 172.18.0.6:56612 on port 1883.
+1767021813: New client connected from 172.18.0.6:56612 as Telegraf-Consumer-5ha3T (p2, c1, k60).
+1767023292: Client Telegraf-Consumer-5ha3T disconnected.
+1767023295: New connection from 172.18.0.6:47076 on port 1883.
+1767023295: New client connected from 172.18.0.6:47076 as Telegraf-Consumer-0huv3 (p2, c1, k60).
+1767023532: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1767025333: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1767026640: Client nodered-client disconnected.
+1767026640: New connection from 172.18.0.3:35662 on port 1883.
+1767026640: New client connected from 172.18.0.3:35662 as nodered-client (p2, c1, k60).
+1767026668: Client Telegraf-Consumer-0huv3 disconnected.
+1767026668: Client nodered-client disconnected.
+1767026672: mosquitto version 2.0.22 terminating
+1767026672: Saving in-memory database to /mosquitto/data//mosquitto.db.
