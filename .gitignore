@@ -13,3 +13,6 @@ nodered/data/.npm/
 nodered/data/*.backup
 # Ignoriamo i file di stato runtime (opzionale, ma consigliato)
 nodered/data/.config.runtime.json
+
+nodered/data/.config.users.json
+nodered/data/.config.nodes.json
