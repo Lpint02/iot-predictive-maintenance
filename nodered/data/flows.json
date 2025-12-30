@@ -166,5 +166,32 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "aac7afe57ca3f9f2",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "yaragambirasio",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 660,
+        "y": 500,
+        "wires": [
+            []
+        ]
     }
 ]
