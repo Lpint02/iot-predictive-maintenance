@@ -1,0 +1,15 @@
+influxdb/data/
+influxdb/config/
+grafana/data/
+mosquitto/data/
+mosquitto/log/
+
+# --- NODE-RED (Configurazione mista) ---
+# Ignoriamo le librerie scaricate (si reinstallano da sole)
+nodered/data/node_modules/
+# Ignoriamo la cache di npm
+nodered/data/.npm/
+# Ignoriamo i backup automatici che fa Node-RED
+nodered/data/*.backup
+# Ignoriamo i file di stato runtime (opzionale, ma consigliato)
+nodered/data/.config.runtime.json
