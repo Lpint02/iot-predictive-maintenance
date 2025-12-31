@@ -1,0 +1,52 @@
+{
+  "mqtt": {
+    "broker": "mosquitto",
+    "port": 1883,
+    "client_id": "simulatore_iiot_project"
+  },
+  "simulation": {
+    "interval_seconds": 2
+  },
+  "topology": {
+    "sectors": {
+      "prefix": "sector",
+      "count": 2 
+    },
+    "lines_per_sector": {
+      "prefix": "line",
+      "count": 3
+    },
+    "assets_per_line": {
+      "prefix": "engine",
+      "count": 5
+    }
+  },
+  "templates": {
+    "standard_motor": [
+      {
+        "type": "vibration",
+        "unit": "g",
+        "min": 0.0,
+        "max": 10.0,
+        "base_val_avg": 0.5,
+        "base_val_variance": 0.2
+      },
+      {
+        "type": "temperature",
+        "unit": "C",
+        "min": 20.0,
+        "max": 110.0,
+        "base_val_avg": 45.0,
+        "base_val_variance": 5.0
+      },
+      {
+        "type": "current",
+        "unit": "A",
+        "min": 0.0,
+        "max": 25.0,
+        "base_val_avg": 12.0,
+        "base_val_variance": 2.0
+      }
+    ]
+  }
+}

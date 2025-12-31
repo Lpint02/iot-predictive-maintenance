@@ -77,6 +77,17 @@ services:
     networks:
       - iot-net
 
+  sensor-simulator:
+    build: ./sensors
+    container_name: iot-sensor-simulator
+    restart: always
+    depends_on:
+      - mosquitto
+    networks:
+      - iot-net
+    volumes:
+      - ./sensors/config:/app/config
+
 networks:
   iot-net:
     driver: bridge

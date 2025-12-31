@@ -17,6 +17,6 @@
                 "welcome": "4.1.0"
             }
         },
-        "menu-menu-item-sidebar": false
+        "menu-menu-item-sidebar": true
     }
 }

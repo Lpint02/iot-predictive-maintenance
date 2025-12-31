@@ -7,6 +7,14 @@
         "info": ""
     },
     {
+        "id": "c6e8cb3f0fdabd11",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "3536842a.5b987c",
         "type": "mqtt-broker",
         "name": "Broker Locale Docker",
@@ -18,6 +26,7 @@
         "protocolVersion": "4",
         "keepalive": "60",
         "cleansession": true,
+        "autoUnsubscribe": true,
         "birthTopic": "",
         "birthQos": "0",
         "birthPayload": "",
@@ -30,6 +39,7 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
+        "userProps": "",
         "sessionExpiry": ""
     },
     {
@@ -193,5 +203,42 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "88c4c518e4f9efe7",
+        "type": "mqtt in",
+        "z": "c6e8cb3f0fdabd11",
+        "name": "",
+        "topic": "sector_1/line_1/engine_1/temperature",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "3536842a.5b987c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 370,
+        "y": 200,
+        "wires": [
+            [
+                "fa684371ea1ed1b6"
+            ]
+        ]
+    },
+    {
+        "id": "fa684371ea1ed1b6",
+        "type": "debug",
+        "z": "c6e8cb3f0fdabd11",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 340,
+        "wires": []
     }
 ]
