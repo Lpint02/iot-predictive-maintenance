@@ -33,7 +33,7 @@
       },
       {
         "type": "temperature",
-        "unit": "C",
+        "unit": "°C",
         "min": 20.0,
         "max": 110.0,
         "base_val_avg": 45.0,
