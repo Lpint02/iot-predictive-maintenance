@@ -2,17 +2,9 @@
     {
         "id": "f6f2187d.f17ca8",
         "type": "tab",
-        "label": "Test IoT",
+        "label": "Sensors Debug",
         "disabled": false,
         "info": ""
-    },
-    {
-        "id": "c6e8cb3f0fdabd11",
-        "type": "tab",
-        "label": "Flow 1",
-        "disabled": false,
-        "info": "",
-        "env": []
     },
     {
         "id": "3536842a.5b987c",
@@ -75,7 +67,10 @@
         "x": 410,
         "y": 200,
         "wires": [
-            []
+            [
+                "3cc11d24.ff01a2",
+                "d2345e12.98765"
+            ]
         ]
     },
     {
@@ -98,7 +93,9 @@
         "x": 200,
         "y": 200,
         "wires": [
-            []
+            [
+                "e5974e51.7587b"
+            ]
         ]
     },
     {
@@ -202,7 +199,7 @@
     {
         "id": "88c4c518e4f9efe7",
         "type": "mqtt in",
-        "z": "c6e8cb3f0fdabd11",
+        "z": "f6f2187d.f17ca8",
         "name": "",
         "topic": "sector_1/line_1/engine_1/temperature",
         "qos": "2",
@@ -212,8 +209,8 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 370,
-        "y": 200,
+        "x": 310,
+        "y": 240,
         "wires": [
             [
                 "fa684371ea1ed1b6"
@@ -223,7 +220,7 @@
     {
         "id": "fa684371ea1ed1b6",
         "type": "debug",
-        "z": "c6e8cb3f0fdabd11",
+        "z": "f6f2187d.f17ca8",
         "name": "debug 1",
         "active": true,
         "tosidebar": true,
@@ -232,8 +229,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 720,
-        "y": 340,
+        "x": 660,
+        "y": 380,
         "wires": []
     }
 ]
