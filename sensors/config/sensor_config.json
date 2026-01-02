@@ -26,26 +26,38 @@
       {
         "type": "vibration",
         "unit": "g",
-        "min": 0.0,
-        "max": 10.0,
-        "base_val_avg": 0.5,
-        "base_val_variance": 0.2
+        "min": 0.07,
+        "max": 0.30,
+        "base_val_avg": 0.10,
+        "base_val_variance": 0.2,
+        "thresholds": {
+          "warning": 0.14,
+          "critical": 0.23
+        }
       },
       {
         "type": "temperature",
         "unit": "C",
-        "min": 20.0,
-        "max": 110.0,
-        "base_val_avg": 45.0,
-        "base_val_variance": 5.0
+        "min": 90.0,
+        "max": 170.0,
+        "base_val_avg": 110.0,
+        "base_val_variance": 5.0,
+        "thresholds": {
+          "warning": 130.0,
+          "critical": 150.0
+        }
       },
       {
         "type": "current",
         "unit": "A",
-        "min": 0.0,
-        "max": 25.0,
-        "base_val_avg": 12.0,
-        "base_val_variance": 2.0
+        "min": 90.0,
+        "max": 120.0,
+        "base_val_avg": 95.0,
+        "base_val_variance": 2.0,
+        "thresholds": {
+          "warning": 105.0,
+          "critical": 110.0
+        }
       }
     ]
   }

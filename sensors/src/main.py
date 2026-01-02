@@ -2,6 +2,7 @@ import json
 import time
 import random
 import paho.mqtt.client as mqtt
+from datetime import datetime
 from sensor_factory import create_sensor
 
 # Percorsi file nel container Docker
@@ -10,8 +11,13 @@ CONFIG_PATH = '/app/config/sensor_config.json'
 print("--- AVVIO SIMULATORE IIoT ---")
 
 # 1. Caricamento Configurazione
-with open(CONFIG_PATH, 'r') as f:
-    config = json.load(f)
+try:
+    with open(CONFIG_PATH, 'r') as f:
+        config = json.load(f)
+except FileNotFoundError:
+    print(f"ERRORE CRITICO: Non trovo il file {CONFIG_PATH}")
+    print("Verifica che il volume nel docker-compose sia: - ./sensors/config:/app/config")
+    exit(1)
 
 # Parametri MQTT e Simulazione
 BROKER = config['mqtt']['broker']
@@ -110,8 +116,8 @@ try:
             # B. Creazione Payload JSON come da specifiche 
             payload = {
                 "value": valore,
-                "unit": sensor.unit
-                # Timestamp opzionale, utile per debug ma non richiesto strettamente dal doc JSON
+                "unit": sensor.unit,
+                "timestamp": datetime.utcnow().isoformat()
             }
             
             # C. Pubblicazione
