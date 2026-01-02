@@ -5,7 +5,9 @@
     "client_id": "simulatore_iiot_project"
   },
   "simulation": {
-    "interval_seconds": 2
+    "interval_seconds": 2,
+    "normal_state_probability": 0.85,
+    "warning_state_probability": 0.95
   },
   "topology": {
     "sectors": {
@@ -37,7 +39,7 @@
       },
       {
         "type": "temperature",
-        "unit": "C",
+        "unit": "°C",
         "min": 90.0,
         "max": 170.0,
         "base_val_avg": 110.0,

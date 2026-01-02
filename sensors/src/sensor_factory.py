@@ -15,18 +15,18 @@ class GenericSensor:
         self.warning_threshold = thresholds.get("warning", None)
         self.critical_threshold = thresholds.get("critical", None)
 
-    def _generate_state_based_value(self):
+    def _generate_state_based_value(self, normal_state_prob, warning_state_prob):
         """
-        Generate a valkuie based on a probability of fault
+        Generate a value based on a probability of fault
         """
         dice = random.random()
 
-        if dice < 0.85:
+        if dice < normal_state_prob:
             # Normal operation
             noise = np.random.normal(0, (self.warning_threshold - self.base_val) * 0.1)
             val = self.base_val + noise
             return min(val, self.warning_threshold - 0.1)
-        elif dice < 0.95:
+        elif dice < warning_state_prob:
             # Warning state
             return random.uniform(self.warning_threshold, self.critical_threshold)
 

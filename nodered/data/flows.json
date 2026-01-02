@@ -35,190 +35,7 @@
         "sessionExpiry": ""
     },
     {
-        "id": "3cc11d24.ff01a2",
-        "type": "mqtt out",
-        "z": "f6f2187d.f17ca8",
-        "name": "To Mosquitto",
-        "topic": "",
-        "qos": "",
-        "retain": "",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "3536842a.5b987c",
-        "x": 610,
-        "y": 200,
-        "wires": []
-    },
-    {
-        "id": "e5974e51.7587b",
-        "type": "function",
-        "z": "f6f2187d.f17ca8",
-        "name": "Simula Dati Motore",
-        "func": "// Simulazione dati IoT - Progetto Predictive Maintenance\n// Struttura Topic: sector/line/asset/sensor\n// Payload: { \"value\": X, \"unit\": \"Y\" }\n\n// 1. Genera valori simulati\n// Vibrazione (simula un motore che vibra un po')\nvar vib = (Math.random() * 2).toFixed(2); \n// Temperatura (tra 40 e 50 gradi)\nvar temp = (40 + Math.random() * 10).toFixed(1); \n\n// 2. Crea il messaggio per la VIBRAZIONE\nvar msgVibration = {\n    topic: \"sector_1/line_1/engine_1/vibration\",\n    payload: {\n        \"value\": parseFloat(vib),\n        \"unit\": \"g\"\n    }\n};\n\n// 3. Crea il messaggio per la TEMPERATURA\nvar msgTemperature = {\n    topic: \"sector_1/line_1/engine_1/temperature\",\n    payload: {\n        \"value\": parseFloat(temp),\n        \"unit\": \"Celsius\"\n    }\n};\n\n// 4. Ritorna entrambi i messaggi (Node-RED li invierà in sequenza)\nreturn [[msgVibration, msgTemperature]];",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 410,
-        "y": 200,
-        "wires": [
-            [
-                "3cc11d24.ff01a2",
-                "d2345e12.98765"
-            ]
-        ]
-    },
-    {
-        "id": "d1234e12.12345",
-        "type": "inject",
-        "z": "f6f2187d.f17ca8",
-        "name": "Ogni 5s",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "5",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 200,
-        "y": 200,
-        "wires": [
-            [
-                "e5974e51.7587b"
-            ]
-        ]
-    },
-    {
-        "id": "d2345e12.98765",
-        "type": "debug",
-        "z": "f6f2187d.f17ca8",
-        "name": "Vedo i dati?",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 610,
-        "y": 280,
-        "wires": []
-    },
-    {
-        "id": "c766fc67628a218b",
-        "type": "inject",
-        "z": "f6f2187d.f17ca8",
-        "name": "freebossetti",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 210,
-        "y": 500,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "171587ac5d68a421",
-        "type": "inject",
-        "z": "f6f2187d.f17ca8",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 440,
-        "y": 500,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "aac7afe57ca3f9f2",
-        "type": "inject",
-        "z": "f6f2187d.f17ca8",
-        "name": "yaragambirasio",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 660,
-        "y": 500,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "88c4c518e4f9efe7",
-        "type": "mqtt in",
-        "z": "f6f2187d.f17ca8",
-        "name": "",
-        "topic": "sector_1/line_1/engine_1/temperature",
-        "qos": "2",
-        "datatype": "auto-detect",
-        "broker": "3536842a.5b987c",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 310,
-        "y": 240,
-        "wires": [
-            [
-                "fa684371ea1ed1b6"
-            ]
-        ]
-    },
-    {
-        "id": "fa684371ea1ed1b6",
+        "id": "ce6b790559a5c010",
         "type": "debug",
         "z": "f6f2187d.f17ca8",
         "name": "debug 1",
@@ -230,7 +47,28 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 660,
-        "y": 380,
+        "y": 200,
         "wires": []
+    },
+    {
+        "id": "2eee570a435883b1",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "sector_1/line_1/engine_1/temperature",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "3536842a.5b987c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 370,
+        "y": 160,
+        "wires": [
+            [
+                "ce6b790559a5c010"
+            ]
+        ]
     }
 ]

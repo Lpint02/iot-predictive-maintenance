@@ -102,6 +102,8 @@ client.loop_start()
 
 # 4. Loop Principale di Simulazione
 try:
+    normal_state_prob = config['simulation'].get('normal_state_probability', 0.85)
+    warning_state_prob = config['simulation'].get('warning_state_probability', 0.95)
     while True:
         start_time = time.time()
         
@@ -111,7 +113,7 @@ try:
             topic = item['topic']
             
             # A. Generazione dato fisico
-            valore = sensor.simulate()
+            valore = sensor.simulate(normal_state_prob, warning_state_prob)
             
             # B. Creazione Payload JSON come da specifiche 
             payload = {
