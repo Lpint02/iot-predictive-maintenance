@@ -46,16 +46,16 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 660,
-        "y": 200,
+        "x": 800,
+        "y": 440,
         "wires": []
     },
     {
-        "id": "2eee570a435883b1",
+        "id": "c93003ad475b0e5b",
         "type": "mqtt in",
         "z": "f6f2187d.f17ca8",
         "name": "",
-        "topic": "sector_1/line_1/engine_1/temperature",
+        "topic": "+/+/+/+",
         "qos": "2",
         "datatype": "auto-detect",
         "broker": "3536842a.5b987c",
@@ -63,12 +63,99 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 370,
-        "y": 160,
+        "x": 430,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "87361db8b6291cdb",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "Regex Filter",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "^sector_\\d+/line_\\d+/engine_\\d+/(temperature|vibration|current)$",
+                "vt": "str",
+                "case": false
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 610,
+        "y": 300,
         "wires": [
             [
-                "ce6b790559a5c010"
+                "a7b9f4c23a5ca2d6"
             ]
         ]
+    },
+    {
+        "id": "a7b9f4c23a5ca2d6",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Data Parsing and Extraction",
+        "func": "// Topic Parsing\nvar parts = msg.topic.split(\"/\");\n\nvar sector = parts[0];\nvar line = parts[1];\nvar engine = parts[2];\nvar sensorType = parts[3];\n\n// Payload Extraction\nvar value = msg.payload.value;\nvar unit = msg.payload.unit;\nvar timestamp = msg.payload.timestamp\n\n// Threshold Extraxtion\nvar limits = msg.payload.metadata || {}; \nvar warnLimit = limits.warning_threshold;\nvar critLimit = limits.critical_threshold;\n\n// Alert Logic\nvar status = \"OK\";\nvar alertPriority = \"NONE\";\nvar alertMessage = \"\";\n\nif (critLimit !== undefined && warnLimit !== undefined) {\n    if (value >= critLimit) {\n        status = \"CRITICAL\";\n        alertPriority = \"HIGH\";\n        alertMessage = `CRITICAL ALERT: ${engine} ${sensorType} reached ${value} ${unit} (Limit: ${critLimit})`;\n    } else if (value >= warnLimit) {\n        status = \"WARNING\";\n        alertPriority = \"LOW\";\n        alertMessage = `WARNING: ${engine} ${sensorType} is high: ${value} ${unit} (Limit: ${warnLimit})`;\n    }\n}\n\n// OUTPUT 1: INFLUXDB\nvar dbMessage = {\n    payload: [  //payload is an array for optimization things\n        {\n            measurement: \"machine_telemetry\",\n            tags: {\n                sector: sector,\n                line: line,\n                engine: engine,\n                sensor_type: sensorType,\n                status: status\n            },\n            fields: {\n                value: value,\n                unit: unit,\n                warning_limit: warnLimit || 0,\n                critical_limit: critLimit || 0\n            },\n            timestamp: timestamp\n        }\n    ]\n};\n\n// OUTPUT 2: ALERTING\nvar alertMessageObj = null;\n\nif (status !== \"OK\") {\n    alertMessageObj = {\n        payload: {\n            topic: msg.topic,\n            engine: engine,\n            sensor: sensorType,\n            value: value,\n            status: status,\n            priority: alertPriority,\n            message: alertMessage,\n            timestamp: timestamp\n        }\n    };\n}\n\n\nreturn [dbMessage, alertMessageObj];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 300,
+        "wires": [
+            [],
+            [
+                "048b8beb949fdc47"
+            ]
+        ]
+    },
+    {
+        "id": "38b2d600fed1a704",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1280,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "048b8beb949fdc47",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1260,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "72e07814173f1649",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "TODO: Transorm acceleration in speed (g->mm/s)",
+        "info": "",
+        "x": 650,
+        "y": 180,
+        "wires": []
     }
 ]

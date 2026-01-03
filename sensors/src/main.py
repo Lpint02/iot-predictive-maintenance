@@ -119,7 +119,11 @@ try:
             payload = {
                 "value": valore,
                 "unit": sensor.unit,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.utcnow().isoformat(),
+                "metadata": {
+                    "warning_threshold": sensor.warning_threshold,
+                    "critical_threshold": sensor.critical_threshold
+                }
             }
             
             # C. Pubblicazione

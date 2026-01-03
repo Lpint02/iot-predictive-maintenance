@@ -34,24 +34,24 @@ class GenericSensor:
             # Critical state
             return random.uniform(self.critical_threshold, self.max)
 
-    def simulate(self):
-        return round(self._genertate_state_based_value(), 2)
+    def simulate(self, normal_state_prob, warning_state_prob):
+        return round(self._generate_state_based_value(normal_state_prob, warning_state_prob), 2)
 
 
 class VibrationSensor(GenericSensor):
     """
     Simulate Accelerometer sensor data
     """
-    def simulate(self):
-        val = self._generate_state_based_value()
+    def simulate(self, normal_state_prob, warning_state_prob):
+        val = self._generate_state_based_value(normal_state_prob, warning_state_prob)
         return round(max(0.0, val), 2)
 
 class TemperatureSensor(GenericSensor):
     """
     Simulate Temperature sensor data
     """
-    def simulate(self):
-        val = self._generate_state_based_value()
+    def simulate(self, normal_state_prob, warning_state_prob):
+        val = self._generate_state_based_value(normal_state_prob, warning_state_prob)
         return round(max(0.0, val), 2)
 
 
@@ -59,8 +59,8 @@ class CurrentSensor(GenericSensor):
     """
     Simulate Current sensor data
     """
-    def simulate(self):
-        val = self._generate_state_based_value()
+    def simulate(self, normal_state_prob, warning_state_prob):
+        val = self._generate_state_based_value(normal_state_prob, warning_state_prob)
         return round(max(0.0, val), 2)
 
 def create_sensor(sensor_config):
