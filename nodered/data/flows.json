@@ -3,8 +3,16 @@
         "id": "f6f2187d.f17ca8",
         "type": "tab",
         "label": "Sensors Debug",
-        "disabled": false,
+        "disabled": true,
         "info": ""
+    },
+    {
+        "id": "a0420dce9ec0f215",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
     },
     {
         "id": "3536842a.5b987c",
@@ -29,6 +37,37 @@
         "closeMsg": {},
         "willTopic": "",
         "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ba8dd9a004289d65",
+        "type": "mqtt-broker",
+        "name": "Mosquitto Local",
+        "broker": "mosquitto",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
         "willPayload": "",
         "willMsg": {},
         "userProps": "",
@@ -156,6 +195,43 @@
         "info": "",
         "x": 650,
         "y": 180,
+        "wires": []
+    },
+    {
+        "id": "559ce50ec0be1fb5",
+        "type": "mqtt in",
+        "z": "a0420dce9ec0f215",
+        "name": "",
+        "topic": "#",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "ba8dd9a004289d65",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 970,
+        "y": 140,
+        "wires": [
+            [
+                "5c250a5d2363c5fa"
+            ]
+        ]
+    },
+    {
+        "id": "5c250a5d2363c5fa",
+        "type": "debug",
+        "z": "a0420dce9ec0f215",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1360,
+        "y": 140,
         "wires": []
     }
 ]
