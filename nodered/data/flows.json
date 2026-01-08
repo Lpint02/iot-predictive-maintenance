@@ -222,8 +222,8 @@
         "z": "f6f2187d.f17ca8",
         "name": "TODO: Transorm acceleration in speed (g->mm/s)",
         "info": "",
-        "x": 650,
-        "y": 180,
+        "x": 810,
+        "y": 80,
         "wires": []
     },
     {
@@ -296,20 +296,6 @@
         ]
     },
     {
-        "id": "9882b2c9921f4279",
-        "type": "telegram sender",
-        "z": "f6f2187d.f17ca8",
-        "name": "",
-        "bot": "f6a8706dd3fd18d3",
-        "haserroroutput": false,
-        "outputs": 1,
-        "x": 1650,
-        "y": 540,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "1687ea50cc065dd0",
         "type": "switch",
         "z": "f6f2187d.f17ca8",
@@ -344,6 +330,20 @@
         "x": 1650,
         "y": 700,
         "wires": []
+    },
+    {
+        "id": "9882b2c9921f4279",
+        "type": "telegram sender",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "bot": "f6a8706dd3fd18d3",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1650,
+        "y": 540,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "559ce50ec0be1fb5",
