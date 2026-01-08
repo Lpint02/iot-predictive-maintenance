@@ -16,3 +16,5 @@ nodered/data/.config.runtime.json
 
 nodered/data/.config.users.json
 nodered/data/.config.nodes.json
+
+.env
