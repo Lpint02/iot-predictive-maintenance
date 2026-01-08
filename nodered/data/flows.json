@@ -296,20 +296,6 @@
         ]
     },
     {
-        "id": "9882b2c9921f4279",
-        "type": "telegram sender",
-        "z": "f6f2187d.f17ca8",
-        "name": "",
-        "bot": "f6a8706dd3fd18d3",
-        "haserroroutput": false,
-        "outputs": 1,
-        "x": 1650,
-        "y": 540,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "1687ea50cc065dd0",
         "type": "switch",
         "z": "f6f2187d.f17ca8",
@@ -346,6 +332,20 @@
         "wires": []
     },
     {
+        "id": "9882b2c9921f4279",
+        "type": "telegram sender",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "bot": "f6a8706dd3fd18d3",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1650,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
         "id": "559ce50ec0be1fb5",
         "type": "mqtt in",
         "z": "a0420dce9ec0f215",
@@ -375,7 +375,8 @@
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
         "x": 1360,

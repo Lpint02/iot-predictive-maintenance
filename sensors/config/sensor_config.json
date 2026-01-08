@@ -6,8 +6,8 @@
   },
   "simulation": {
     "interval_seconds": 2,
-    "normal_state_probability": 0.85,
-    "warning_state_probability": 0.95
+    "normal_state_probability": 0.99,
+    "warning_state_probability": 0.997
   },
   "topology": {
     "sectors": {
