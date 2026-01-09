@@ -101,6 +101,21 @@
         "verboselogging": false
     },
     {
+        "id": "c81978a127dbd6de",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "database",
+        "name": "InfluxDBConnection",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://iot-influxdb:8086",
+        "timeout": 10,
+        "rejectUnauthorized": true
+    },
+    {
         "id": "ce6b790559a5c010",
         "type": "debug",
         "z": "f6f2187d.f17ca8",
@@ -168,7 +183,7 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "Data Parsing and Extraction",
-        "func": "// Topic Parsing\nvar parts = msg.topic.split(\"/\");\n\nvar sector = parts[0];\nvar line = parts[1];\nvar engine = parts[2];\nvar sensorType = parts[3];\n\n// Payload Extraction\nvar value = msg.payload.value;\nvar unit = msg.payload.unit;\nvar timestamp = msg.payload.timestamp\n\n// Threshold Extraxtion\nvar limits = msg.payload.metadata || {}; \nvar warnLimit = limits.warning_threshold;\nvar critLimit = limits.critical_threshold;\n\n// Alert Logic\nvar status = \"OK\";\nvar alertPriority = \"NONE\";\nvar alertMessage = \"\";\n\nif (critLimit !== undefined && warnLimit !== undefined) {\n    if (value >= critLimit) {\n        status = \"CRITICAL\";\n        alertPriority = \"HIGH\";\n        alertMessage = `CRITICAL ALERT: ${engine} ${sensorType} reached ${value} ${unit} (Limit: ${critLimit})`;\n    } else if (value >= warnLimit) {\n        status = \"WARNING\";\n        alertPriority = \"LOW\";\n        alertMessage = `WARNING: ${engine} ${sensorType} is high: ${value} ${unit} (Limit: ${warnLimit})`;\n    }\n}\n\n// OUTPUT 1: INFLUXDB\nvar dbMessage = {\n    payload: [  //payload is an array for optimization things\n        {\n            measurement: \"machine_telemetry\",\n            tags: {\n                sector: sector,\n                line: line,\n                engine: engine,\n                sensor_type: sensorType,\n                status: status\n            },\n            fields: {\n                value: value,\n                unit: unit,\n                warning_limit: warnLimit || 0,\n                critical_limit: critLimit || 0\n            },\n            timestamp: timestamp\n        }\n    ]\n};\n\n// OUTPUT 2: ALERTING\nvar alertMessageObj = null;\n\nif (status !== \"OK\") {\n    alertMessageObj = {\n        payload: {\n            topic: msg.topic,\n            engine: engine,\n            sensor: sensorType,\n            value: value,\n            status: status,\n            priority: alertPriority,\n            message: alertMessage,\n            timestamp: timestamp\n        }\n    };\n}\n\n\nreturn [dbMessage, alertMessageObj];",
+        "func": "// Topic Parsing\nvar parts = msg.topic.split(\"/\");\n\nvar sector = parts[0];\nvar line = parts[1];\nvar engine = parts[2];\nvar sensorType = parts[3];\n\n// Payload Extraction\nvar value = msg.payload.value;\nvar unit = msg.payload.unit;\nvar timestamp = new Date(msg.payload.timestamp); \n\n// Threshold Extraxtion\nvar limits = msg.payload.metadata || {}; \nvar warnLimit = limits.warning_threshold;\nvar critLimit = limits.critical_threshold;\n\n// Alert Logic\nvar status = \"OK\";\nvar alertPriority = \"NONE\";\nvar alertMessage = \"\";\n\nif (critLimit !== undefined && warnLimit !== undefined) {\n    if (value >= critLimit) {\n        status = \"CRITICAL\";\n        alertPriority = \"HIGH\";\n        alertMessage = `CRITICAL ALERT: ${engine} ${sensorType} reached ${value} ${unit} (Limit: ${critLimit})`;\n    } else if (value >= warnLimit) {\n        status = \"WARNING\";\n        alertPriority = \"LOW\";\n        alertMessage = `WARNING: ${engine} ${sensorType} is high: ${value} ${unit} (Limit: ${warnLimit})`;\n    }\n}\n\n// OUTPUT 1: INFLUXDB\nvar dbMessage = {\n    payload: \n    [\n        {\n            value: value,\n            unit: unit,\n            warning_limit: warnLimit || 0,\n            critical_limit: critLimit || 0\n        },\n        {\n            sector: sector,\n            line: line,\n            engine: engine,\n            sensor_type: sensorType,\n        },\n    ]    \n};\n\n// OUTPUT 2: ALERTING\nvar alertMessageObj = null;\n\nif (status !== \"OK\") {\n    alertMessageObj = {\n        payload: {\n            topic: msg.topic,\n            engine: engine,\n            sensor: sensorType,\n            value: value,\n            status: status,\n            priority: alertPriority,\n            message: alertMessage,\n            timestamp: timestamp\n        }\n    };\n}\n\n\nreturn [dbMessage, alertMessageObj];",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -178,7 +193,9 @@
         "x": 880,
         "y": 300,
         "wires": [
-            [],
+            [
+                "27d7b569bf9e57e7"
+            ],
             [
                 "1687ea50cc065dd0"
             ]
@@ -222,8 +239,8 @@
         "z": "f6f2187d.f17ca8",
         "name": "TODO: Transorm acceleration in speed (g->mm/s)",
         "info": "",
-        "x": 810,
-        "y": 80,
+        "x": 650,
+        "y": 180,
         "wires": []
     },
     {
@@ -346,6 +363,24 @@
         ]
     },
     {
+        "id": "27d7b569bf9e57e7",
+        "type": "influxdb out",
+        "z": "f6f2187d.f17ca8",
+        "influxdb": "c81978a127dbd6de",
+        "name": "influxdb",
+        "measurement": "machine_telemetry",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "univaq",
+        "bucket": "iot_bucket",
+        "x": 1120,
+        "y": 220,
+        "wires": []
+    },
+    {
         "id": "559ce50ec0be1fb5",
         "type": "mqtt in",
         "z": "a0420dce9ec0f215",
@@ -361,7 +396,9 @@
         "x": 970,
         "y": 140,
         "wires": [
-            []
+            [
+                "5c250a5d2363c5fa"
+            ]
         ]
     },
     {

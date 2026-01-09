@@ -53,11 +53,13 @@ services:
     image: telegraf:latest
     container_name: iot-telegraf
     restart: always
+    user: root
     depends_on:
       - influxdb
       - mosquitto
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - INFLUX_TOKEN=${INFLUX_TOKEN}
     networks:
