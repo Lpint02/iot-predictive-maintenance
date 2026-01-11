@@ -1,0 +1,899 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 0,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ef9rcuf8xdlogb"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Warning"
+                },
+                "properties": [
+                  {
+                    "id": "custom.drawStyle",
+                    "value": "line"
+                  },
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-yellow",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Critical"
+                },
+                "properties": [
+                  {
+                    "id": "custom.drawStyle",
+                    "value": "line"
+                  },
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "dark-red",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 15,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.1",
+          "targets": [
+            {
+              "query": "// 1. Definiamo i target basati sulle variabili della dashboard\ntarget_sector = /^${sector}$/\ntarget_line   = /^${line}$/\ntarget_engine = /^${engine}$/\n\nfrom(bucket: \"iot_bucket\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_telemetry\")\n  |> filter(fn: (r) => r[\"sector\"] =~ target_sector)\n  |> filter(fn: (r) => r[\"line\"]   =~ target_line)\n  |> filter(fn: (r) => r[\"engine\"] =~ target_engine)\n  // SELEZIONE SENSORE: Temperatura\n  |> filter(fn: (r) => r[\"sensor_type\"] == \"temperature\")\n  \n  // 2. Chiediamo sia il valore che i limiti\n  |> filter(fn: (r) => r[\"_field\"] == \"value\" or r[\"_field\"] == \"warning_limit\" or r[\"_field\"] == \"critical_limit\")\n  \n  // 3. Rinominiamo i campi per renderli leggibili nella legenda\n  |> map(fn: (r) => ({\n      r with \n      _field: \n        if r._field == \"value\" then \"Temperatura (°C)\" \n        else if r._field == \"warning_limit\" then \"Warning\" \n        else \"Critical\"\n    })\n  )\n  |> yield(name: \"temperature_data\")",
+              "refId": "A"
+            }
+          ],
+          "title": "Temperature Time Series Graph (°C)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ef9rcuf8xdlogb"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "displayName": "${__field.name}",
+              "mappings": [],
+              "max": 170,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 130
+                  },
+                  {
+                    "color": "red",
+                    "value": 150
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 16
+          },
+          "id": 2,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "pluginVersion": "12.2.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "ef9rcuf8xdlogb"
+              },
+              "query": "import \"strings\"\r\n\r\nfrom(bucket: \"iot_bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_telemetry\")\r\n  |> filter(fn: (r) => r[\"sector\"] =~ /${sector:regex}/)\r\n  |> filter(fn: (r) => r[\"line\"]   =~ /${line:regex}/)\r\n  |> filter(fn: (r) => r[\"engine\"]  =~ /${engine:regex}/)\r\n  |> filter(fn: (r) => r[\"sensor_type\"] == \"temperature\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  \r\n  // --- LOGICA INTELLIGENTE --\r\n  |> map(fn: (r) => {\r\n      // 1. Prepariamo le versioni corte\r\n      short_s = \"S\" + strings.replaceAll(v: r.sector, t: \"sector_\", u: \"\")\r\n      short_l = \"L\" + strings.replaceAll(v: r.line, t: \"line_\", u: \"\")\r\n      short_e = \"E\" + strings.replaceAll(v: r.engine, t: \"engine_\", u: \"\")\r\n      \r\n      // 2. Componiamo le due stringhe complete\r\n      label_short = short_s + \"/\" + short_l + \"/\" + short_e\r\n      label_long  = r.sector + \"/\" + r.line + \"/\" + r.engine\r\n      \r\n      // 3. IF/ELSE: Se la variabile Grafana è \".*\" (ALL), usa la corta, altrimenti la lunga\r\n      // Nota: usiamo \"${sector}\" con le virgolette per trattarlo come stringa\r\n      final_label = if \"${sector}\" == \".*\" then label_short else label_long\r\n\r\n      // Restituiamo la riga aggiornando il campo \"_field\" con la nostra etichetta dinamica\r\n      return { r with _field: final_label }\r\n  })\r\n\r\n  |> last()\r\n  |> yield(name: \"Temp\")",
+              "refId": "A"
+            }
+          ],
+          "title": "Temperature Gauges (°C)",
+          "type": "gauge"
+        }
+      ],
+      "title": "THERMICAL ANALYTICS",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 5,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ef9rcuf8xdlogb"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "stepAfter",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "displayName": "${__field.labels.sector}/${__field.labels.line}/${__field.labels.engine}",
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "dark-red",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "amp"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Critical"
+                },
+                "properties": [
+                  {
+                    "id": "custom.lineWidth",
+                    "value": 2
+                  },
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-red",
+                      "mode": "fixed",
+                      "seriesBy": "last"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Warning"
+                },
+                "properties": [
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "custom.lineWidth",
+                    "value": 2
+                  },
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-yellow",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                  "id": "byNames",
+                  "options": {
+                    "mode": "exclude",
+                    "names": [
+                      "sector_1/line_3/engine_3",
+                      "sector_1/line_1/engine_1",
+                      "sector_1/line_2/engine_1",
+                      "sector_1/line_3/engine_1",
+                      "sector_1/line_1/engine_2",
+                      "sector_1/line_2/engine_2",
+                      "sector_1/line_3/engine_2",
+                      "sector_1/line_1/engine_3",
+                      "sector_1/line_2/engine_3",
+                      "sector_1/line_3/engine_3",
+                      "sector_1/line_1/engine_4",
+                      "sector_1/line_2/engine_4",
+                      "sector_1/line_3/engine_4",
+                      "sector_1/line_1/engine_5",
+                      "sector_1/line_2/engine_5",
+                      "sector_1/line_3/engine_5",
+                      "sector_1/line_1/engine_1",
+                      "sector_1/line_2/engine_1",
+                      "sector_1/line_3/engine_1",
+                      "sector_1/line_1/engine_2",
+                      "sector_1/line_2/engine_2",
+                      "sector_1/line_3/engine_2",
+                      "sector_1/line_1/engine_3",
+                      "sector_1/line_2/engine_3",
+                      "sector_1/line_3/engine_3",
+                      "sector_1/line_1/engine_4",
+                      "sector_1/line_2/engine_4",
+                      "sector_1/line_3/engine_4",
+                      "sector_1/line_1/engine_5",
+                      "sector_1/line_2/engine_5",
+                      "sector_1/line_3/engine_5"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": false,
+                      "tooltip": true,
+                      "viz": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 24,
+            "x": 0,
+            "y": 26
+          },
+          "id": 3,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "ef9rcuf8xdlogb"
+              },
+              "query": "// 1. Definiamo i target \r\n\r\ntarget_sector = /^${sector}$/\r\ntarget_line   = /^${line}$/\r\ntarget_engine = /^${engine}$/ // InfluxDB mostra \"engine\", non \"asset\"\r\n\r\nfrom(bucket: \"iot_bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_telemetry\")\r\n  |> filter(fn: (r) => r[\"sector\"] =~ target_sector)\r\n  |> filter(fn: (r) => r[\"line\"]   =~ target_line)\r\n  |> filter(fn: (r) => r[\"engine\"] =~ target_engine)\r\n  |> filter(fn: (r) => r[\"sensor_type\"] == \"current\")\r\n  \r\n  // 2. Chiediamo sia il valore che i limiti\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\" or r[\"_field\"] == \"warning_limit\" or r[\"_field\"] == \"critical_limit\")\r\n  \r\n  // 3. Rinominiamo i campi per renderli leggibili nelle opzioni\r\n  |> map(fn: (r) => ({\r\n      r with \r\n      _field: \r\n        if r._field == \"value\" then \"Corrente (A)\" \r\n        else if r._field == \"warning_limit\" then \"Warning\" \r\n        else \"Critical\"\r\n    })\r\n  )\r\n  |> yield(name: \"data_with_limits\")",
+              "refId": "A"
+            }
+          ],
+          "title": "Current Absorption Time Series (Ampere)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ef9rcuf8xdlogb"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "displayName": "${__field.name}",
+              "mappings": [],
+              "max": 120,
+              "min": 80,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 105
+                  },
+                  {
+                    "color": "red",
+                    "value": 110
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 40
+          },
+          "id": 9,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "pluginVersion": "12.2.1",
+          "targets": [
+            {
+              "query": "import \"strings\"\n\nfrom(bucket: \"iot_bucket\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_telemetry\")\n  |> filter(fn: (r) => r[\"sector\"] =~ /${sector:regex}/)\n  |> filter(fn: (r) => r[\"line\"]   =~ /${line:regex}/)\n  |> filter(fn: (r) => r[\"engine\"]  =~ /${engine:regex}/)\n  // FILTRO FONDAMENTALE: Cerchiamo solo la corrente\n  |> filter(fn: (r) => r[\"sensor_type\"] == \"current\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  \n  // --- INIZIO LOGICA ETICHETTE INTELLIGENTI ---\n  |> map(fn: (r) => {\n      // Creiamo le versioni corte\n      short_s = \"S\" + strings.replaceAll(v: r.sector, t: \"sector_\", u: \"\")\n      short_l = \"L\" + strings.replaceAll(v: r.line, t: \"line_\", u: \"\")\n      short_e = \"E\" + strings.replaceAll(v: r.engine, t: \"engine_\", u: \"\")\n      \n      // Componiamo le due opzioni\n      label_short = short_s + \"/\" + short_l + \"/\" + short_e\n      label_long  = r.sector + \"/\" + r.line + \"/\" + r.engine\n      \n      // Selettore: Se \"sector\" è ALL (.*), usa la corta. Altrimenti la lunga.\n      final_label = if \"${sector}\" == \".*\" then label_short else label_long\n\n      // Sostituiamo il nome del field con la nostra etichetta\n      return { r with _field: final_label }\n  })\n  // ------------------------------------------\n  \n  |> last()\n  // Pulizia finale per evitare che Grafana mostri tag residui\n  |> keep(columns: [\"_value\", \"_time\", \"_field\"]) \n  |> yield(name: \"Current\")",
+              "refId": "A"
+            }
+          ],
+          "title": "Current Absorption Gauges (Ampere)",
+          "type": "gauge"
+        }
+      ],
+      "title": "ELECTRIC CURRENT ANALYTICS",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "id": 4,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ef9rcuf8xdlogb"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "displayName": "${__field.name} ${__field.labels.sector}/${__field.labels.line}/${__field.labels.engine}",
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "mm/s"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Critical"
+                },
+                "properties": [
+                  {
+                    "id": "custom.lineWidth",
+                    "value": 2
+                  },
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-red",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Warning"
+                },
+                "properties": [
+                  {
+                    "id": "custom.lineWidth",
+                    "value": 2
+                  },
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-yellow",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 24,
+            "x": 0,
+            "y": 27
+          },
+          "id": 1,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "ef9rcuf8xdlogb"
+              },
+              "query": "// 1. Definiamo i Target\r\ntarget_sector = /^${sector}$/\r\ntarget_line   = /^${line}$/\r\ntarget_engine = /^${engine}$/\r\n\r\n// 2. Scarichiamo TUTTI i dati (Valore + Limiti)\r\nfrom(bucket: \"iot_bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_telemetry\")\r\n  |> filter(fn: (r) => r[\"sector\"] =~ target_sector)\r\n  |> filter(fn: (r) => r[\"line\"]   =~ target_line)\r\n  |> filter(fn: (r) => r[\"engine\"] =~ target_engine)\r\n  |> filter(fn: (r) => r[\"sensor_type\"] == \"vibration\")\r\n  // Prendiamo valore grezzo E limiti grezzi\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\" or r[\"_field\"] == \"warning_limit\" or r[\"_field\"] == \"critical_limit\")\r\n  // Pulizia tag inutili\r\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"engine\", \"line\", \"sector\"])\r\n\r\n  // 3. CONVERSIONE E RINOMINA (Tutto x 31.21)\r\n  \r\n  |> map(fn: (r) => ({ r with _value: r._value * 31.21 })) \r\n  |> map(fn: (r) => ({\r\n      r with \r\n      _field: \r\n        if r._field == \"value\" then \"Velocità ISO (mm/s)\" \r\n        else if r._field == \"warning_limit\" then \"Warning\" \r\n        else \"Critical\"\r\n    })\r\n  )\r\n  |> yield(name: \"velocity_only\")",
+              "refId": "A"
+            }
+          ],
+          "title": "Vibration Time Series (mm/s)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ef9rcuf8xdlogb"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "displayName": "${__field.name}",
+              "mappings": [],
+              "max": 10,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 4.4
+                  },
+                  {
+                    "color": "semi-dark-red",
+                    "value": 7.2
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 40
+          },
+          "id": 7,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "pluginVersion": "12.2.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "ef9rcuf8xdlogb"
+              },
+              "query": "import \"strings\"\r\n\r\nfrom(bucket: \"iot_bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_telemetry\")\r\n  |> filter(fn: (r) => r[\"sector\"] =~ /${sector:regex}/)\r\n  |> filter(fn: (r) => r[\"line\"]   =~ /${line:regex}/)\r\n  |> filter(fn: (r) => r[\"engine\"]  =~ /${engine:regex}/)\r\n  |> filter(fn: (r) => r[\"sensor_type\"] == \"vibration\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\" or r[\"_field\"] == \"warning_limit\" or r[\"_field\"] == \"critical_limit\")\r\n  \r\n  // 1. CONVERSIONE (g -> mm/s)\r\n  |> map(fn: (r) => ({ r with _value: r._value * 31.21 }))\r\n\r\n  // 2. Pivot\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n\r\n  // 3. Etichette Intelligenti\r\n  |> map(fn: (r) => {\r\n      short_s = \"S\" + strings.replaceAll(v: r.sector, t: \"sector_\", u: \"\")\r\n      short_l = \"L\" + strings.replaceAll(v: r.line, t: \"line_\", u: \"\")\r\n      short_e = \"E\" + strings.replaceAll(v: r.engine, t: \"engine_\", u: \"\")\r\n      \r\n      label_short = short_s + \"/\" + short_l + \"/\" + short_e\r\n      label_long  = r.sector + \"/\" + r.line + \"/\" + r.engine\r\n      \r\n      final_label = if \"${sector}\" == \".*\" then label_short else label_long\r\n\r\n      // Restituiamo il valore convertito\r\n      return { r with _field: final_label, _value: r.value }\r\n  })\r\n  \r\n  |> last()\r\n  |> keep(columns: [\"_value\", \"_time\", \"_field\"])\r\n  \r\n  // --- MODIFICA FONDAMENTALE QUI SOTTO ---\r\n  // Raggruppiamo per _field. Questo dice a Grafana: \"Ogni nome diverso è un Gauge diverso\"\r\n  |> group(columns: [\"_field\"]) \r\n  \r\n  |> yield(name: \"Vibration_mm_s\")",
+              "refId": "A"
+            }
+          ],
+          "title": "Vibration Gauges (mm/s)",
+          "type": "gauge"
+        }
+      ],
+      "title": "VIBRATION ANALYTICS (ISO 10816)",
+      "type": "row"
+    }
+  ],
+  "preload": false,
+  "refresh": "5s",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "sector_1",
+          "value": "sector_1"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\r\nschema.tagValues(bucket: \"iot_bucket\", tag: \"sector\")",
+        "includeAll": true,
+        "label": "Settore",
+        "name": "sector",
+        "options": [],
+        "query": {
+          "query": "import \"influxdata/influxdb/schema\"\r\nschema.tagValues(bucket: \"iot_bucket\", tag: \"sector\")"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "from(bucket: \"iot_bucket\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"sector\"] == \"${sector}\")\r\n  |> keep(columns: [\"line\"])\r\n  |> distinct(column: \"line\")\r\n  |> keep(columns: [\"_value\"])",
+        "includeAll": true,
+        "label": "Linea",
+        "name": "line",
+        "options": [],
+        "query": {
+          "query": "from(bucket: \"iot_bucket\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"sector\"] == \"${sector}\")\r\n  |> keep(columns: [\"line\"])\r\n  |> distinct(column: \"line\")\r\n  |> keep(columns: [\"_value\"])"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "from(bucket: \"iot_bucket\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"sector\"] == \"${sector}\")\r\n  |> filter(fn: (r) => r[\"line\"] == \"${line}\")\r\n  |> keep(columns: [\"engine\"])\r\n  |> distinct(column: \"engine\")\r\n  |> keep(columns: [\"_value\"])",
+        "includeAll": true,
+        "label": "Macchinario",
+        "name": "engine",
+        "options": [],
+        "query": {
+          "query": "from(bucket: \"iot_bucket\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"sector\"] == \"${sector}\")\r\n  |> filter(fn: (r) => r[\"line\"] == \"${line}\")\r\n  |> keep(columns: [\"engine\"])\r\n  |> distinct(column: \"engine\")\r\n  |> keep(columns: [\"_value\"])"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "iot-maintenance",
+  "uid": "adq4bsq1",
+  "version": 46
+}
