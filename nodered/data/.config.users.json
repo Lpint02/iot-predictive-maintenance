@@ -23,6 +23,9 @@
                 }
             }
         },
-        "menu-menu-item-sidebar": true
+        "menu-menu-item-sidebar": true,
+        "debug": {
+            "filter": "filterAll"
+        }
     }
 }

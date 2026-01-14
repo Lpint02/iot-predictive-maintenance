@@ -202,22 +202,6 @@
         ]
     },
     {
-        "id": "38b2d600fed1a704",
-        "type": "debug",
-        "z": "f6f2187d.f17ca8",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1220,
-        "y": 120,
-        "wires": []
-    },
-    {
         "id": "048b8beb949fdc47",
         "type": "debug",
         "z": "f6f2187d.f17ca8",
@@ -244,51 +228,18 @@
         "wires": []
     },
     {
-        "id": "d2ac9031bc9c407b",
-        "type": "switch",
-        "z": "f6f2187d.f17ca8",
-        "name": "warning/critical separator",
-        "property": "payload.priority",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "HIGH",
-                "vt": "str"
-            },
-            {
-                "t": "eq",
-                "v": "LOW",
-                "vt": "str"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 1070,
-        "y": 520,
-        "wires": [
-            [
-                "f6e6c5b5403e335c"
-            ],
-            [
-                "01a150fc477feff9"
-            ]
-        ]
-    },
-    {
         "id": "f6e6c5b5403e335c",
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "format critical",
-        "func": "// Recupero i dati\nvar topicParts = msg.payload.topic.split(\"/\"); // Divide: sector_1 / line_1 / ...\nvar sector = topicParts[0].replace(\"_\", \" \").toUpperCase(); // Diventa \"SECTOR 1\"\nvar line = topicParts[1].replace(\"_\", \" \").toUpperCase();   // Diventa \"LINE 1\"\nvar engine = msg.payload.engine;\nvar val = msg.payload.value;\n\n// Estraggo il limite dal messaggio di testo originale\n// Il messaggio originale è tipo: \"... (Limit: 0.23)\"\nvar limitMatch = msg.payload.message.match(/Limit: ([\\d\\.]+)/);\nvar limit = limitMatch ? limitMatch[1] : \"N/A\";\n\n// Seleziono un'icona in base al sensore\nvar iconSensor = \"📡\";\nif (msg.payload.sensor === \"temperature\") iconSensor = \"🌡️\";\nif (msg.payload.sensor === \"vibration\") iconSensor = \"📳\";\nif (msg.payload.sensor === \"current\") iconSensor = \"⚡\";\n\n// Preparo il messaggio per il nodo Telegram\nmsg.payload = {\n    chatId: 490504940, \n    type: 'message',\n    content: \"🚨🔥 <b>CRITICAL ALARM</b> 🔥🚨\\n\\n\" +\n        \"🏭 <b>ZONA:</b> \" + sector + \" - \" + line + \"\\n\" +\n        \"⚙️ <b>MACCHINA:</b> \" + engine + \"\\n\" +\n        iconSensor + \" <b>SENSORE:</b> \" + msg.payload.sensor.toUpperCase() + \"\\n\\n\" +\n        \"📈 <b>RILEVATO:</b> \" + val + \"\\n\" +\n        \"⛔ <b>LIMITE MAX:</b> \" + limit + \"\\n\\n\" +\n        \"‼️ <b>INTERVENTO IMMEDIATO RICHIESTO</b>\",\n    options: { parse_mode: \"HTML\" }\n};\nreturn msg;\n",
+        "func": "// Recupero i dati\nvar topicParts = msg.payload.topic.split(\"/\"); // Divide: sector_1 / line_1 / ...\nvar sector = topicParts[0].replace(\"_\", \" \").toUpperCase(); // Diventa \"SECTOR 1\"\nvar line = topicParts[1].replace(\"_\", \" \").toUpperCase();   // Diventa \"LINE 1\"\nvar engine = msg.payload.engine;\nvar val = msg.payload.value;\n\n// Estraggo il limite dal messaggio di testo originale\n// Il messaggio originale è tipo: \"... (Limit: 0.23)\"\nvar limitMatch = msg.payload.message.match(/Limit: ([\\d\\.]+)/);\nvar limit = limitMatch ? limitMatch[1] : \"N/A\";\n\n// Seleziono un'icona in base al sensore\nvar iconSensor = \"📡\";\nif (msg.payload.sensor === \"temperature\") iconSensor = \"🌡️\";\nif (msg.payload.sensor === \"vibration\") iconSensor = \"📳\";\nif (msg.payload.sensor === \"current\") iconSensor = \"⚡\";\n\n// Preparo il messaggio per il nodo Telegram\nmsg.payload = {\n    chatId: msg.targetChatId, \n    type: 'message',\n    content: \"🚨🔥 <b>CRITICAL ALARM</b> 🔥🚨\\n\\n\" +\n        \"🏭 <b>ZONA:</b> \" + sector + \" - \" + line + \"\\n\" +\n        \"⚙️ <b>MACCHINA:</b> \" + engine + \"\\n\" +\n        iconSensor + \" <b>SENSORE:</b> \" + msg.payload.sensor.toUpperCase() + \"\\n\\n\" +\n        \"📈 <b>RILEVATO:</b> \" + val + \"\\n\" +\n        \"⛔ <b>LIMITE MAX:</b> \" + limit + \"\\n\\n\" +\n        \"‼️ <b>INTERVENTO IMMEDIATO RICHIESTO</b>\",\n    options: { parse_mode: \"HTML\" }\n};\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1350,
+        "x": 1490,
         "y": 440,
         "wires": [
             []
@@ -299,15 +250,15 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "format warning",
-        "func": "// Recupero i dati dal topic\nvar topicParts = msg.payload.topic.split(\"/\");\nvar sector = topicParts[0].replace(\"_\", \" \"); // es: \"sector 1\"\nvar line = topicParts[1].replace(\"_\", \" \");   // es: \"line 3\"\n\n// Recupero il limite (Soglia Warning)\nvar limitMatch = msg.payload.message.match(/Limit: ([\\d\\.]+)/);\nvar limit = limitMatch ? limitMatch[1] : \"N/A\";\n\n// Icona sensore\nvar iconSensor = \"📡\";\nif (msg.payload.sensor === \"temperature\") iconSensor = \"🌡️\";\nif (msg.payload.sensor === \"vibration\") iconSensor = \"📳\";\nif (msg.payload.sensor === \"current\") iconSensor = \"⚡\";\n\nmsg.payload = {\n    chatId: 490504940, // <--- RICORDATI IL TUO ID GRUPPO QUI\n    type: 'message',\n    content: \"⚠️ <b>Avviso Manutenzione</b> ⚠️\\n\" +\n        \"<i>Rilevata anomalia non critica</i>\\n\\n\" +\n        \"📍 <b>Dove:</b> \" + sector + \", \" + line + \"\\n\" +\n        \"🔧 <b>Asset:</b> \" + msg.payload.engine + \"\\n\" +\n        iconSensor + \" <b>Sensore:</b> \" + msg.payload.sensor + \"\\n\\n\" +\n        \"📊 <b>Valore Attuale:</b> \" + msg.payload.value + \"\\n\" +\n        \"⚠️ <b>Soglia Warning:</b> \" + limit + \"\\n\\n\" +\n        \"ℹ️ <i>Si consiglia un controllo al prossimo giro.</i>\",\n    options: { parse_mode: \"HTML\" }\n};\nreturn msg;",
+        "func": "// Recupero i dati dal topic\nvar topicParts = msg.payload.topic.split(\"/\");\nvar sector = topicParts[0].replace(\"_\", \" \"); // es: \"sector 1\"\nvar line = topicParts[1].replace(\"_\", \" \");   // es: \"line 3\"\n\n// Recupero il limite (Soglia Warning)\nvar limitMatch = msg.payload.message.match(/Limit: ([\\d\\.]+)/);\nvar limit = limitMatch ? limitMatch[1] : \"N/A\";\n\n// Icona sensore\nvar iconSensor = \"📡\";\nif (msg.payload.sensor === \"temperature\") iconSensor = \"🌡️\";\nif (msg.payload.sensor === \"vibration\") iconSensor = \"📳\";\nif (msg.payload.sensor === \"current\") iconSensor = \"⚡\";\n\nmsg.payload = {\n    chatId: msg.targetChatId, // prende l'id del gruppo del suo settore impostato  \n    type: 'message',\n    content: \"⚠️ <b>Avviso Manutenzione</b> ⚠️\\n\" +\n        \"<i>Rilevata anomalia non critica</i>\\n\\n\" +\n        \"📍 <b>Dove:</b> \" + sector + \", \" + line + \"\\n\" +\n        \"🔧 <b>Asset:</b> \" + msg.payload.engine + \"\\n\" +\n        iconSensor + \" <b>Sensore:</b> \" + msg.payload.sensor + \"\\n\\n\" +\n        \"📊 <b>Valore Attuale:</b> \" + msg.payload.value + \"\\n\" +\n        \"⚠️ <b>Soglia Warning:</b> \" + limit + \"\\n\\n\" +\n        \"ℹ️ <i>Si consiglia un controllo al prossimo giro.</i>\",\n    options: { parse_mode: \"HTML\" }\n};\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1340,
-        "y": 600,
+        "x": 1500,
+        "y": 560,
         "wires": [
             []
         ]
@@ -316,25 +267,34 @@
         "id": "1687ea50cc065dd0",
         "type": "switch",
         "z": "f6f2187d.f17ca8",
-        "name": "filtro linea/settore",
+        "name": "Router Settori",
         "property": "payload.topic",
         "propertyType": "msg",
         "rules": [
             {
                 "t": "regex",
-                "v": "/line_1/engine_3/",
+                "v": "^sector_1/",
+                "vt": "str",
+                "case": false
+            },
+            {
+                "t": "regex",
+                "v": "^sector_2/",
                 "vt": "str",
                 "case": false
             }
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 1,
-        "x": 1070,
-        "y": 420,
+        "outputs": 2,
+        "x": 840,
+        "y": 460,
         "wires": [
             [
-                "d2ac9031bc9c407b"
+                "0b41bae309edf2b9"
+            ],
+            [
+                "54b329618b63438c"
             ]
         ]
     },
@@ -356,8 +316,8 @@
         "bot": "f6a8706dd3fd18d3",
         "haserroroutput": false,
         "outputs": 1,
-        "x": 1650,
-        "y": 540,
+        "x": 1790,
+        "y": 500,
         "wires": [
             []
         ]
@@ -379,6 +339,93 @@
         "x": 1120,
         "y": 220,
         "wires": []
+    },
+    {
+        "id": "0b41bae309edf2b9",
+        "type": "change",
+        "z": "f6f2187d.f17ca8",
+        "name": "Set ID Settore 1",
+        "rules": [
+            {
+                "t": "set",
+                "p": "targetChatId",
+                "pt": "msg",
+                "to": "-5099471754",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1060,
+        "y": 420,
+        "wires": [
+            [
+                "86140135fcf7c2ae"
+            ]
+        ]
+    },
+    {
+        "id": "54b329618b63438c",
+        "type": "change",
+        "z": "f6f2187d.f17ca8",
+        "name": "Set ID Settore 2",
+        "rules": [
+            {
+                "t": "set",
+                "p": "targetChatId",
+                "pt": "msg",
+                "to": "-1003533031224",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1060,
+        "y": 520,
+        "wires": [
+            [
+                "86140135fcf7c2ae"
+            ]
+        ]
+    },
+    {
+        "id": "86140135fcf7c2ae",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "Switch Priority",
+        "property": "payload.priority",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "HIGH",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "LOW",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1280,
+        "y": 480,
+        "wires": [
+            [
+                "f6e6c5b5403e335c"
+            ],
+            [
+                "01a150fc477feff9"
+            ]
+        ]
     },
     {
         "id": "559ce50ec0be1fb5",
