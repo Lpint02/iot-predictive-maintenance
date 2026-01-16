@@ -21,8 +21,17 @@ services:
     restart: always
     ports:
       - "1880:1880"
+    env_file:
+      - .env
     environment:
       - TZ=Europe/Rome
+      - INFLUX_URL=${INFLUX_URL}
+      - INFLUX_TOKEN=${INFLUX_TOKEN}
+      - INFLUX_ORG=${INFLUX_ORG}
+      - INFLUX_BUCKET=${INFLUX_BUCKET}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID_SECTOR_1=${TELEGRAM_CHAT_ID_SECTOR_1}
+      - TELEGRAM_CHAT_ID_SECTOR_2=${TELEGRAM_CHAT_ID_SECTOR_2}
     volumes:
       - ./nodered/data:/data
     networks:
@@ -35,12 +44,14 @@ services:
     restart: always
     ports:
       - "8086:8086"
+    env_file:
+      - .env
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpassword123
-      - DOCKER_INFLUXDB_INIT_ORG=univaq
-      - DOCKER_INFLUXDB_INIT_BUCKET=iot_bucket
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUX_USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUX_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUX_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUX_BUCKET}
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_TOKEN}
     volumes:
       - ./influxdb/data:/var/lib/influxdb2
@@ -60,6 +71,8 @@ services:
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
     environment:
       - INFLUX_TOKEN=${INFLUX_TOKEN}
     networks:

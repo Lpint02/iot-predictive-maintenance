@@ -111,7 +111,7 @@
         "usetls": false,
         "tls": "",
         "influxdbVersion": "2.0",
-        "url": "http://iot-influxdb:8086",
+        "url": "${INFLUX_URL}",
         "timeout": 10,
         "rejectUnauthorized": true
     },
@@ -127,7 +127,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 620,
+        "x": 680,
         "y": 720,
         "wires": []
     },
@@ -213,18 +213,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 980,
-        "y": 680,
-        "wires": []
-    },
-    {
-        "id": "72e07814173f1649",
-        "type": "comment",
-        "z": "f6f2187d.f17ca8",
-        "name": "TODO: Transorm acceleration in speed (g->mm/s)",
-        "info": "",
-        "x": 650,
-        "y": 180,
+        "x": 940,
+        "y": 660,
         "wires": []
     },
     {
@@ -299,16 +289,6 @@
         ]
     },
     {
-        "id": "b55bb8f1b93c69d2",
-        "type": "comment",
-        "z": "f6f2187d.f17ca8",
-        "name": "ho duvuto mette un solo motore senno arrivavano 200 messaggi al secondo, i warning e i critcal sono troppo frequenti",
-        "info": "ho duvuto mette un solo motore senno arrivavano 200 messaggi al secondo, i warning e i critcal sono troppo frequenti",
-        "x": 1650,
-        "y": 700,
-        "wires": []
-    },
-    {
         "id": "9882b2c9921f4279",
         "type": "telegram sender",
         "z": "f6f2187d.f17ca8",
@@ -334,8 +314,8 @@
         "database": "database",
         "precisionV18FluxV20": "ms",
         "retentionPolicyV18Flux": "",
-        "org": "univaq",
-        "bucket": "iot_bucket",
+        "org": "${INFLUX_ORG}",
+        "bucket": "${INFLUX_BUCKET}",
         "x": 1120,
         "y": 220,
         "wires": []
@@ -350,7 +330,7 @@
                 "t": "set",
                 "p": "targetChatId",
                 "pt": "msg",
-                "to": "-5099471754",
+                "to": "${TELEGRAM_CHAT_ID_SECTOR_1}",
                 "tot": "num"
             }
         ],
@@ -377,7 +357,7 @@
                 "t": "set",
                 "p": "targetChatId",
                 "pt": "msg",
-                "to": "-1003533031224",
+                "to": "${TELEGRAM_CHAT_ID_SECTOR_2}",
                 "tot": "num"
             }
         ],
