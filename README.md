@@ -65,9 +65,16 @@ The project utilizes a **"Single Source of Truth"** principle for all hardware a
 
 ### Prerequisites
 - Docker & Docker Compose installed.
-- A Telegram Bot (via @BotFather) for real-time notifications.
+- Acces to a terminal with `git`.
 
-## Getting Started
+### Telegram Bot Configuration
+To receive real-time industrial alerts, follow these steps:
+1. **Create the Bot:** Search for `@BotFather` on Telegram. Send `/newbot` and follow the instructions to get your **API Token**.
+2. **Create Alert Groups**: Create 2 separate groups (e.g., "Sector 1 Alerts" and "Sector 2 Alerts").
+3.**Get Chat IDs:** Add your bot to these groups. To find the group ID, add a bot like `@IDBot` or `@userinfobot` to the group, or use the Telegram API: `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates.`
+4. **Update** `.env`: Insert the `TELEGRAM_TOKEN` and the `CHAT_ID` for each sector/group in your `.env` file.
+   
+### Launch the Stack
 - **Clone the repository**
 ```bash
 git clone https://github.com/your-username/iot-predictive-maintenance.git
@@ -78,18 +85,24 @@ Copy the template and fill in your InfluxDB tokens and Telegram credentials.
 ```bash
 cp .env.template .env
 ```
-- **Clone the repository**
+- **Start Containers**
 ```bash
 docker-compose up -d
 ```
-### Accessing Interfaces
-- **Grafana Dashboards:** `http://localhost:3000` (Default: admin/admin)
-- **Node-RED Flows:** `http://localhost:1880`
-- **InfluxDB UI:** `http://localhost:8086`
-  
+### Grafana Data Source Setup
+1. Login to `http://localhost:3000` (admin/admin).
+2. Go to **Connections > Data Sources > Add data source**.
+3. Select **InfluxDB**.
+4. Settings:
+   - **Query Language:** Flux  
+   - **URL:** `http://influxdb:8086`
+   - **Auth**: Disable "Basic Auth", ensure "Token" is provided in the InfluxDB Details section.
+   - **InfluxDB Details:** Fill in your Organization, Token, and Default Bucket as defined in your `.env`.
+     
 ---
 
 ## 🛠️ Troubleshooting
+- **Dashboard UID Mismatch:** If you import a pre-configured dashboard and see no data, ensure the **Data Source UID** in the dashboard JSON matches the one assigned by Grafana. You can find the correct UID in the **URL** of the InfluxDB data source settings page (e.g., the string after `/edit/`) and manually replace it within the dashboard's JSON model.
 - **MQTT Connection Refused:** The simulator waits for Mosquitto to be ready. If errors persist, verify the `iot-mosquitto` container status with `docker ps`.
 - **Data missing in Grafana:** Check Node-RED logs for authentication errors. Ensure the `INFLUX_TOKEN` in `.env` matches your InfluxDB setup exactly.
 - **Telegram Alerts not received:** Verify the Bot API Key and ensure you have started a conversation with the bot to obtain the correct `CHAT_ID`.
@@ -100,9 +113,9 @@ docker-compose up -d
 ---
 
 ## 👥 Authors
-- @flebo45
-- @Lpint02
-- @mattpaol441
+- [flebo45](https://github.com/flebo45)
+- [Lpint02](https://github.com/Lpint02)
+- [mattpaol441](https://github.com/mattpaol441)
 ---
 
 
