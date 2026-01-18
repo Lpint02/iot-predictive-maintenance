@@ -1,4 +1,4 @@
-# 🏭 IoT Predictive Maintenance System (Phase 1)
+# 🏭 IoT Predictive Maintenance System
 
 [![Docker](https://img.shields.io/badge/Docker-24.0+-blue?logo=docker&logoColor=white)](https://www.docker.com/)
 [![Node-RED](https://img.shields.io/badge/Node--RED-3.1+-red?logo=node-red&logoColor=white)](https://nodered.org/)
