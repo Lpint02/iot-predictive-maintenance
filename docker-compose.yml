@@ -103,6 +103,16 @@ services:
     volumes:
       - ./sensors/config:/app/config
 
+  # 6. AI SERVICE (Predictive Maintenance)
+  ai-service:
+    build: ./ai_service
+    container_name: iot-ai-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    networks:
+      - iot-net
+
 networks:
   iot-net:
     driver: bridge

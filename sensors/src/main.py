@@ -4,6 +4,7 @@ import random
 import paho.mqtt.client as mqtt
 from datetime import datetime
 from sensor_factory import create_sensor
+from prediction_engine import PredictionEngine
 
 # Percorsi file nel container Docker
 CONFIG_PATH = '/app/config/sensor_config.json'
@@ -24,6 +25,10 @@ BROKER = config['mqtt']['broker']
 PORT = config['mqtt']['port']
 CLIENT_ID = config['mqtt']['client_id']
 INTERVAL = config['simulation']['interval_seconds']
+
+PREDICTION_ID = "sector_1/line_1/engine_1"
+prediction_engine = PredictionEngine(PREDICTION_ID)
+
 
 # 2. Generazione Procedurale della Topologia
 # Qui trasformiamo la configurazione "compatta" in una lista reale di sensori attivi.
@@ -47,33 +52,47 @@ for s in range(1, topo['sectors']['count'] + 1):
         for a in range(1, topo['assets_per_line']['count'] + 1):
             asset_id = f"{topo['assets_per_line']['prefix']}_{a}"
             
+            full_id = f"{sector_id}/{line_id}/{asset_id}"
+            is_prediction_engine = (full_id == PREDICTION_ID)
+
             # Per ogni motore, applichiamo il template dei sensori
             for template_sensor in motor_template:
-                # Creiamo una copia per non modificare il dizionario originale
-                sensor_conf = template_sensor.copy()
-                
-                # --- LOGICA DI VARIANZA ---
-                # Per rendere realistico il sistema, ogni motore ha un punto di lavoro leggermente diverso.
-                # Calcoliamo il 'base_val' specifico per QUESTO sensore di QUESTO motore.
-                avg = sensor_conf.get('base_val_avg', 0)
-                variance = sensor_conf.get('base_val_variance', 0)
-                
-                # Valore base unico = Media +/- valore random entro la varianza
-                unique_base_val = avg + random.uniform(-variance, variance)
-                sensor_conf['base_val'] = unique_base_val
-                
-                # Creiamo l'oggetto fisico (Factory)
-                sensor_obj = create_sensor(sensor_conf)
-                
-                # --- COSTRUZIONE TOPIC MQTT ---
-                # Struttura richiesta: sector_X/line_Y/engine_Z/type
-                topic = f"{sector_id}/{line_id}/{asset_id}/{sensor_conf['type']}"
+                sensor_type = template_sensor['type']
+                topic = f"{full_id}/{sensor_type}"
+
+                sensor_entry = {
+                    "topic": topic,
+                    "type": sensor_type,
+                    "unit": template_sensor['unit'],
+                    "limits": {
+                        "warning_threshold": template_sensor['thresholds']['warning'],
+                        "critical_threshold": template_sensor['thresholds']['critical']
+                    }
+                }
+
+                if is_prediction_engine:
+                    sensor_entry['obj'] = prediction_engine
+                    sensor_entry['mode'] = 'prediction_engine'
+                else:
+
+                    # Creiamo una copia per non modificare il dizionario originale
+                    sensor_conf = template_sensor.copy()
+                    
+                    # --- LOGICA DI VARIANZA ---
+                    # Per rendere realistico il sistema, ogni motore ha un punto di lavoro leggermente diverso.
+                    # Calcoliamo il 'base_val' specifico per QUESTO sensore di QUESTO motore.
+                    avg = sensor_conf.get('base_val_avg', 0)
+                    variance = sensor_conf.get('base_val_variance', 0)
+                    
+                    # Valore base unico = Media +/- valore random entro la varianza
+                    unique_base_val = avg + random.uniform(-variance, variance)
+                    sensor_conf['base_val'] = unique_base_val
+
+                    sensor_entry['obj'] = create_sensor(sensor_conf)
+                    sensor_entry['mode'] = 'standard'
                 
                 # Salviamo nella lista dei sensori attivi
-                active_sensors.append({
-                    "obj": sensor_obj,
-                    "topic": topic
-                })
+                active_sensors.append(sensor_entry)
 
 print(f"Inizializzazione completata: {len(active_sensors)} sensori pronti.")
 
@@ -106,23 +125,32 @@ try:
     warning_state_prob = config['simulation'].get('warning_state_probability', 0.95)
     while True:
         start_time = time.time()
+        loop_timestamp = datetime.utcnow().isoformat()
+
+        prediction_engine.step()  # Aggiorna il motore di predizione
         
         # Iteriamo su tutti i sensori generati
         for item in active_sensors:
             sensor = item['obj']
             topic = item['topic']
+
+            if item['mode'] == 'prediction_engine':
+                # Usare il motore di predizione per generare il dato
+                valore = sensor.get_value(item['type'])
+
+            else:
             
-            # A. Generazione dato fisico
-            valore = sensor.simulate(normal_state_prob, warning_state_prob)
+                # A. Generazione dato fisico
+                valore = sensor.simulate(normal_state_prob, warning_state_prob)
             
             # B. Creazione Payload JSON come da specifiche 
             payload = {
                 "value": valore,
-                "unit": sensor.unit,
-                "timestamp": datetime.utcnow().isoformat(),
+                "unit": item['unit'],
+                "timestamp": loop_timestamp,
                 "metadata": {
-                    "warning_threshold": sensor.warning_threshold,
-                    "critical_threshold": sensor.critical_threshold
+                    "warning_threshold": item['limits']['warning_threshold'],
+                    "critical_threshold": item['limits']['critical_threshold']
                 }
             }
             

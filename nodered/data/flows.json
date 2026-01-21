@@ -116,38 +116,23 @@
         "rejectUnauthorized": true
     },
     {
-        "id": "ce6b790559a5c010",
-        "type": "debug",
-        "z": "f6f2187d.f17ca8",
-        "name": "debug 1",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 680,
-        "y": 720,
-        "wires": []
-    },
-    {
         "id": "c93003ad475b0e5b",
         "type": "mqtt in",
         "z": "f6f2187d.f17ca8",
         "name": "",
         "topic": "+/+/+/+",
         "qos": "2",
-        "datatype": "auto-detect",
+        "datatype": "json",
         "broker": "3536842a.5b987c",
         "nl": false,
         "rap": true,
         "rh": 0,
         "inputs": 0,
         "x": 430,
-        "y": 300,
+        "y": 480,
         "wires": [
             [
+                "22583c408d9f53e5",
                 "87361db8b6291cdb"
             ]
         ]
@@ -171,7 +156,7 @@
         "repair": false,
         "outputs": 1,
         "x": 610,
-        "y": 300,
+        "y": 480,
         "wires": [
             [
                 "a7b9f4c23a5ca2d6"
@@ -191,7 +176,7 @@
         "finalize": "",
         "libs": [],
         "x": 880,
-        "y": 300,
+        "y": 480,
         "wires": [
             [
                 "27d7b569bf9e57e7"
@@ -200,22 +185,6 @@
                 "1687ea50cc065dd0"
             ]
         ]
-    },
-    {
-        "id": "048b8beb949fdc47",
-        "type": "debug",
-        "z": "f6f2187d.f17ca8",
-        "name": "debug 3",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 940,
-        "y": 660,
-        "wires": []
     },
     {
         "id": "f6e6c5b5403e335c",
@@ -230,7 +199,7 @@
         "finalize": "",
         "libs": [],
         "x": 1490,
-        "y": 440,
+        "y": 620,
         "wires": [
             []
         ]
@@ -248,7 +217,7 @@
         "finalize": "",
         "libs": [],
         "x": 1500,
-        "y": 560,
+        "y": 740,
         "wires": [
             []
         ]
@@ -278,7 +247,7 @@
         "repair": false,
         "outputs": 2,
         "x": 840,
-        "y": 460,
+        "y": 640,
         "wires": [
             [
                 "0b41bae309edf2b9"
@@ -307,7 +276,7 @@
         "type": "influxdb out",
         "z": "f6f2187d.f17ca8",
         "influxdb": "c81978a127dbd6de",
-        "name": "influxdb",
+        "name": "influxdb_machine_telemetry",
         "measurement": "machine_telemetry",
         "precision": "",
         "retentionPolicy": "",
@@ -316,8 +285,8 @@
         "retentionPolicyV18Flux": "",
         "org": "${INFLUX_ORG}",
         "bucket": "${INFLUX_BUCKET}",
-        "x": 1120,
-        "y": 220,
+        "x": 1180,
+        "y": 400,
         "wires": []
     },
     {
@@ -340,7 +309,7 @@
         "to": "",
         "reg": false,
         "x": 1060,
-        "y": 420,
+        "y": 600,
         "wires": [
             [
                 "86140135fcf7c2ae"
@@ -367,7 +336,7 @@
         "to": "",
         "reg": false,
         "x": 1060,
-        "y": 520,
+        "y": 700,
         "wires": [
             [
                 "86140135fcf7c2ae"
@@ -397,7 +366,7 @@
         "repair": false,
         "outputs": 2,
         "x": 1280,
-        "y": 480,
+        "y": 660,
         "wires": [
             [
                 "f6e6c5b5403e335c"
@@ -406,6 +375,154 @@
                 "01a150fc477feff9"
             ]
         ]
+    },
+    {
+        "id": "22583c408d9f53e5",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "Regex Filter",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "^sector_1\\/line_1\\/engine_1\\/(vibration|temperature|current)$",
+                "vt": "str",
+                "case": false
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 610,
+        "y": 220,
+        "wires": [
+            [
+                "5f2c298c4d194516"
+            ]
+        ]
+    },
+    {
+        "id": "5f2c298c4d194516",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Buffer & Payload",
+        "func": "// Configuration\nconst TARGET_ASSET_ID = \"sector_1_line_1_engine_1\";\nconst SEQUENCE_LENGTH = 50;\nconst AI_SERVICE_URL = \"http://ai-service:8000/predict-rul\";\n\n// Physics Constants\nconst FREQ_HZ = 50;\nconst G_TO_MMS2 = 9806.65;\nconst OMEGA = 2 * Math.PI * FREQ_HZ;\n\n// Memory \n// Use 'flow' context to persist data between messages\nvar buffer = flow.get('target_engine_buffer') || {\n    currentReading: {},\n    history: []\n};\n\n// MAnual resets (debug)\nif (msg.payload === \"reset\") {\n    flow.set('target_engine_buffer', undefined);\n    node.status({fill:\"red\", shape:\"dot\", text:\"Buffer Resettato\"});\n    return null;\n}\n\n// Sensor Type Extraction\nvar sensorType = msg.topic.split(\"/\").pop();\n\n// Sensor value\nvar val = msg.payload.value !== undefined ? msg.payload.value : msg.payload;\n\n// Conversion from g to mm/s2\nif (sensorType === \"vibration\") {\n    var acc_mms2 = val * G_TO_MMS2;\n    val = acc_mms2 / OMEGA;\n\n    // 2 decimals\n    val = Math.round(val * 100) / 100;\n}\n\nbuffer.currentReading[sensorType] = val;\n\nvar cur = buffer.currentReading;\n\nif (cur.vibration !== undefined && cur.temperature !== undefined && cur.current !== undefined) {\n\n    // Pydantic object \n    var readingObj = {\n        vibration: cur.vibration,\n        temperature: cur.temperature,\n        current: cur.current\n    };\n\n    buffer.history.push(readingObj);\n\n    // Recupera le chiavi che abbiamo attualmente nel \"limbo\"\n    var keysPresent = Object.keys(buffer.currentReading).join(\", \");\n\n    // Status colorato: \n    // Giallo = In attesa di dati per completare la tripletta\n    // Blu = Tripletta completata e aggiunta alla storia\n    node.status({\n        fill: \"yellow\", \n        shape: \"ring\", \n        text: \"Buf: \" + buffer.history.length + \"/50 | Ho: [\" + keysPresent + \"]\"\n    });\n\n    buffer.currentReading = {};\n\n    // Take only last 50 elements\n    if (buffer.history.length > SEQUENCE_LENGTH) {\n        buffer.history.shift();\n    }\n\n    // Trigger\n    // if 50 elements -> send to the model\n    if (buffer.history.length === SEQUENCE_LENGTH) {\n        // Save updated state\n        flow.set('target_engine_buffer', buffer)\n\n        // FastAPI Payload\n        var apiPayload = {\n            asset_id: TARGET_ASSET_ID,\n            sequence: buffer.history\n        }\n\n        // Set URL and Payload for HTTP Request\n        msg.url = AI_SERVICE_URL;\n        msg.payload = apiPayload;\n\n        // Metadata for next nodes\n        msg.assetId = TARGET_ASSET_ID;\n\n        return msg;\n    }\n}\n// Save updated state\nflow.set('target_engine_buffer', buffer);\n\n// Stop flow, not ready\nreturn null; ",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 220,
+        "wires": [
+            [
+                "6234667e7214b327"
+            ]
+        ]
+    },
+    {
+        "id": "6234667e7214b327",
+        "type": "http request",
+        "z": "f6f2187d.f17ca8",
+        "name": "AI RUL Predict",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://ai-service:8000/predict-rul",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1140,
+        "y": 220,
+        "wires": [
+            [
+                "73b1e774eb5222a0"
+            ]
+        ]
+    },
+    {
+        "id": "b395a96735f31bf5",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "reset",
+        "payloadType": "str",
+        "x": 670,
+        "y": 80,
+        "wires": [
+            [
+                "5f2c298c4d194516"
+            ]
+        ]
+    },
+    {
+        "id": "73b1e774eb5222a0",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Message Building",
+        "func": "const RUL_THRESHOLD = 400;\n\n// Server Response structure: { \"asset_id\": \"...\", \"predicted_rul\": 123.45, \"timestamp\": \"...\", \"status\": \"OK\" }\nvar payload = msg.payload;\n\nvar rul = payload.predicted_rul;\nvar timestamp = payload.timestamp;\nvar assetId = payload.asset_id;\n\n// Asset Id parsing\nvar parts = assetId.match(/(sector_\\d+)_(line_\\d+)_(engine_\\d+)/);\n\nvar sectorTag = parts ? parts[1] : \"unknown\"; // es. sector_1\nvar lineTag   = parts ? parts[2] : \"unknown\"; // es. line_1\nvar engineTag = parts ? parts[3] : \"unknown\"; // es. engine_1\n\n// Influxdb formatting\nvar dbMessage = {\n\n    timestamp: new Date(timestamp),\n\n    payload: \n    [\n        {\n            value: rul,\n            unit: \"cycles\",\n            warning_threshold: RUL_THRESHOLD\n        },\n\n        {\n            sector: sectorTag,\n            line: lineTag,\n            engine: engineTag,\n            sensor_type: \"ai_rul\",\n            source: \"rnn_model\"\n        }\n    ]\n    \n}\n\n// Alerting formatting\nvar alertMessageObj = null;\n\nif (rul < RUL_THRESHOLD) {\n    var message = `⚠️ *PREDICTIVE MAINTENANCE REQUIRED*\\n\\n` +\n               `🏭 Engine: ${assetId}\\n` +\n               `📉 Predicted RUL: *${rul} cicli*\\n` +\n               `⏰ Time: ${timestamp}\\n` +\n               `\\nThe engine has exceeded the safety threshold (${RUL_THRESHOLD}). ` +\n               `Plan immediate intervention.`;\n\n    alertMessageObj = {\n        payload: {\n            engine: engineTag,\n            value: rul,\n            warning_threshold: RUL_THRESHOLD,\n            message: message,\n            timestamp: timestamp\n        }\n    };\n}\n\nreturn [dbMessage, alertMessageObj];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1430,
+        "y": 220,
+        "wires": [
+            [
+                "59f0ddfb08e17f03"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "59f0ddfb08e17f03",
+        "type": "influxdb out",
+        "z": "f6f2187d.f17ca8",
+        "influxdb": "c81978a127dbd6de",
+        "name": "influxdb_ai_predictions",
+        "measurement": "ai_predictions",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "${INFLUX_ORG}",
+        "bucket": "${INFLUX_BUCKET}",
+        "x": 1700,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "2ce01903d6181ad6",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "2nd output is for alerting",
+        "info": "The second output for the function block is for alerting",
+        "x": 1680,
+        "y": 220,
+        "wires": []
     },
     {
         "id": "559ce50ec0be1fb5",
