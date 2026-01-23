@@ -30,8 +30,7 @@ services:
       - INFLUX_ORG=${INFLUX_ORG}
       - INFLUX_BUCKET=${INFLUX_BUCKET}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - TELEGRAM_CHAT_ID_SECTOR_1=${TELEGRAM_CHAT_ID_SECTOR_1}
-      - TELEGRAM_CHAT_ID_SECTOR_2=${TELEGRAM_CHAT_ID_SECTOR_2}
+      - SECTOR_MAP=${SECTOR_MAP}
     volumes:
       - ./nodered/data:/data
     networks:

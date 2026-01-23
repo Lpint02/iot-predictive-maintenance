@@ -25,7 +25,10 @@
         },
         "menu-menu-item-sidebar": true,
         "debug": {
-            "filter": "filterAll"
+            "filter": "filterSelected",
+            "filteredNodes": [
+                "5c250a5d2363c5fa"
+            ]
         }
     }
 }

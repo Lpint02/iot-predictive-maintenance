@@ -182,7 +182,7 @@
                 "27d7b569bf9e57e7"
             ],
             [
-                "1687ea50cc065dd0"
+                "f95c76a8f6b511db"
             ]
         ]
     },
@@ -199,7 +199,7 @@
         "finalize": "",
         "libs": [],
         "x": 1490,
-        "y": 620,
+        "y": 560,
         "wires": [
             []
         ]
@@ -217,56 +217,7 @@
         "finalize": "",
         "libs": [],
         "x": 1500,
-        "y": 740,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "1687ea50cc065dd0",
-        "type": "switch",
-        "z": "f6f2187d.f17ca8",
-        "name": "Router Settori",
-        "property": "payload.topic",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "regex",
-                "v": "^sector_1/",
-                "vt": "str",
-                "case": false
-            },
-            {
-                "t": "regex",
-                "v": "^sector_2/",
-                "vt": "str",
-                "case": false
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 840,
-        "y": 640,
-        "wires": [
-            [
-                "0b41bae309edf2b9"
-            ],
-            [
-                "54b329618b63438c"
-            ]
-        ]
-    },
-    {
-        "id": "9882b2c9921f4279",
-        "type": "telegram sender",
-        "z": "f6f2187d.f17ca8",
-        "name": "",
-        "bot": "f6a8706dd3fd18d3",
-        "haserroroutput": false,
-        "outputs": 1,
-        "x": 1790,
-        "y": 500,
+        "y": 660,
         "wires": [
             []
         ]
@@ -290,60 +241,6 @@
         "wires": []
     },
     {
-        "id": "0b41bae309edf2b9",
-        "type": "change",
-        "z": "f6f2187d.f17ca8",
-        "name": "Set ID Settore 1",
-        "rules": [
-            {
-                "t": "set",
-                "p": "targetChatId",
-                "pt": "msg",
-                "to": "${TELEGRAM_CHAT_ID_SECTOR_1}",
-                "tot": "num"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1060,
-        "y": 600,
-        "wires": [
-            [
-                "86140135fcf7c2ae"
-            ]
-        ]
-    },
-    {
-        "id": "54b329618b63438c",
-        "type": "change",
-        "z": "f6f2187d.f17ca8",
-        "name": "Set ID Settore 2",
-        "rules": [
-            {
-                "t": "set",
-                "p": "targetChatId",
-                "pt": "msg",
-                "to": "${TELEGRAM_CHAT_ID_SECTOR_2}",
-                "tot": "num"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1060,
-        "y": 700,
-        "wires": [
-            [
-                "86140135fcf7c2ae"
-            ]
-        ]
-    },
-    {
         "id": "86140135fcf7c2ae",
         "type": "switch",
         "z": "f6f2187d.f17ca8",
@@ -360,11 +257,16 @@
                 "t": "eq",
                 "v": "LOW",
                 "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "AI_PREDICTION",
+                "vt": "str"
             }
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 2,
+        "outputs": 3,
         "x": 1280,
         "y": 660,
         "wires": [
@@ -373,6 +275,9 @@
             ],
             [
                 "01a150fc477feff9"
+            ],
+            [
+                "08565103fb148088"
             ]
         ]
     },
@@ -480,7 +385,7 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "Message Building",
-        "func": "const RUL_THRESHOLD = 400;\n\n// Server Response structure: { \"asset_id\": \"...\", \"predicted_rul\": 123.45, \"timestamp\": \"...\", \"status\": \"OK\" }\nvar payload = msg.payload;\n\nvar rul = payload.predicted_rul;\nvar timestamp = payload.timestamp;\nvar assetId = payload.asset_id;\n\n// Asset Id parsing\nvar parts = assetId.match(/(sector_\\d+)_(line_\\d+)_(engine_\\d+)/);\n\nvar sectorTag = parts ? parts[1] : \"unknown\"; // es. sector_1\nvar lineTag   = parts ? parts[2] : \"unknown\"; // es. line_1\nvar engineTag = parts ? parts[3] : \"unknown\"; // es. engine_1\n\n// Influxdb formatting\nvar dbMessage = {\n\n    timestamp: new Date(timestamp),\n\n    payload: \n    [\n        {\n            value: rul,\n            unit: \"cycles\",\n            warning_threshold: RUL_THRESHOLD\n        },\n\n        {\n            sector: sectorTag,\n            line: lineTag,\n            engine: engineTag,\n            sensor_type: \"ai_rul\",\n            source: \"rnn_model\"\n        }\n    ]\n    \n}\n\n// Alerting formatting\nvar alertMessageObj = null;\n\nif (rul < RUL_THRESHOLD) {\n    var message = `⚠️ *PREDICTIVE MAINTENANCE REQUIRED*\\n\\n` +\n               `🏭 Engine: ${assetId}\\n` +\n               `📉 Predicted RUL: *${rul} cicli*\\n` +\n               `⏰ Time: ${timestamp}\\n` +\n               `\\nThe engine has exceeded the safety threshold (${RUL_THRESHOLD}). ` +\n               `Plan immediate intervention.`;\n\n    alertMessageObj = {\n        payload: {\n            engine: engineTag,\n            value: rul,\n            warning_threshold: RUL_THRESHOLD,\n            message: message,\n            timestamp: timestamp\n        }\n    };\n}\n\nreturn [dbMessage, alertMessageObj];\n",
+        "func": "const RUL_THRESHOLD = 400;\n\n// Server Response structure: { \"asset_id\": \"...\", \"predicted_rul\": 123.45, \"timestamp\": \"...\", \"status\": \"OK\" }\nvar payload = msg.payload;\n\nvar rul = payload.predicted_rul;\nvar timestamp = payload.timestamp;\nvar assetId = payload.asset_id;\n\n// Asset Id parsing\nvar parts = assetId.match(/(sector_\\d+)_(line_\\d+)_(engine_\\d+)/);\n\nvar sectorTag = parts ? parts[1] : \"unknown\"; // es. sector_1\nvar lineTag   = parts ? parts[2] : \"unknown\"; // es. line_1\nvar engineTag = parts ? parts[3] : \"unknown\"; // es. engine_1\n\n// Influxdb formatting\nvar dbMessage = {\n\n    timestamp: new Date(timestamp),\n\n    payload: \n    [\n        {\n            value: rul,\n            unit: \"cycles\",\n            warning_threshold: RUL_THRESHOLD\n        },\n\n        {\n            sector: sectorTag,\n            line: lineTag,\n            engine: engineTag,\n            sensor_type: \"ai_rul\",\n            source: \"rnn_model\"\n        }\n    ]\n    \n}\n\n// Alerting formatting\nvar alertMessageObj = null;\n\nif (rul < RUL_THRESHOLD) {\n    var message = `⚠️ <b>PREDICTIVE MAINTENANCE REQUIRED</b>\\n\\n` + \n               `🏭 Engine: ${assetId}\\n` +\n               `📉 Predicted RUL: <b>${rul} cicli</b>\\n` + \n               `⏰ Time: ${timestamp}\\n` +\n               `\\nThe engine has exceeded the safety threshold (${RUL_THRESHOLD}). ` +\n               `Plan immediate intervention.`;\n\n    alertMessageObj = {\n        payload: {\n            topic: \"sector_1/line_1/engine_1/ai_rul\",\n            priority: \"AI_PREDICTION\",\n            engine: engineTag,\n            value: rul,\n            warning_threshold: RUL_THRESHOLD,\n            message: message, // Qui passa il messaggio corretto\n            timestamp: timestamp\n        }\n    };\n}\n\nreturn [dbMessage, alertMessageObj];\n",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -491,9 +396,12 @@
         "y": 220,
         "wires": [
             [
-                "59f0ddfb08e17f03"
+                "59f0ddfb08e17f03",
+                "3ceb201d6e4876da"
             ],
-            []
+            [
+                "f95c76a8f6b511db"
+            ]
         ]
     },
     {
@@ -515,14 +423,72 @@
         "wires": []
     },
     {
-        "id": "2ce01903d6181ad6",
-        "type": "comment",
+        "id": "313b91773e641345",
+        "type": "telegram sender",
         "z": "f6f2187d.f17ca8",
-        "name": "2nd output is for alerting",
-        "info": "The second output for the function block is for alerting",
-        "x": 1680,
+        "name": "",
+        "bot": "f6a8706dd3fd18d3",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1830,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f95c76a8f6b511db",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Switch sector/chatid",
+        "func": "// 1. LEGGI LA VARIABILE\nvar mapString = env.get(\"SECTOR_MAP\");\nvar sectorMap = {};\n\n// 2. PARSING ROBUSTO\nif (mapString) {\n    // Rimuoviamo eventuali apici singoli o doppi a inizio/fine stringa\n    // che Docker potrebbe aver passato per errore.\n    var cleanString = mapString.trim();\n    if (cleanString.startsWith(\"'\") && cleanString.endsWith(\"'\")) {\n        cleanString = cleanString.slice(1, -1);\n    }\n    if (cleanString.startsWith('\"') && cleanString.endsWith('\"')) {\n        cleanString = cleanString.slice(1, -1);\n    }\n\n    try {\n        sectorMap = JSON.parse(cleanString);\n        // node.warn(\"Mappa caricata: \" + JSON.stringify(sectorMap)); // Scommenta per debug\n    } catch(e) {\n        node.error(\"ERRORE JSON SECTOR_MAP. Stringa ricevuta: \" + mapString + \" | Errore: \" + e.message);\n        return null;\n    }\n} else {\n    node.error(\"ERRORE: Variabile SECTOR_MAP non trovata nelle variabili d'ambiente!\");\n    return null;\n}\n\n// 3. ESTRAZIONE SETTORE\nvar topic = msg.payload.topic || \"\";\nvar parts = topic.split(\"/\");\nvar currentSector = parts[0]; \n\n// 4. LOOKUP DINAMICO\nvar targetId = sectorMap[currentSector];\n\nif (targetId) {\n    msg.targetChatId = targetId;\n    return msg;\n} else {\n    node.warn(\"Routing Fallito: '\" + currentSector + \"' non trovato nella mappa. Settori disponibili: \" + Object.keys(sectorMap).join(\", \"));\n    return null; \n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1020,
+        "y": 660,
+        "wires": [
+            [
+                "86140135fcf7c2ae"
+            ]
+        ]
+    },
+    {
+        "id": "3ceb201d6e4876da",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1930,
         "y": 220,
         "wires": []
+    },
+    {
+        "id": "08565103fb148088",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "format ai",
+        "func": "// Se non c'è l'ID, non spedire\nif (!msg.targetChatId) return null;\n\n// Recuperiamo il messaggio\nvar testoAlert = msg.payload.message;\n\n// Impacchettiamo per Telegram usando HTML (più sicuro per i nomi con \"_\")\nmsg.payload = {\n    chatId: msg.targetChatId, \n    type: 'message',\n    content: msg.payload.message,    // Mantiene gli a capo\n    options: { parse_mode: \"HTML\" } // <--- CAMBIATO DA MARKDOWN A HTML\n};\n\n// Piccola pulizia extra: se nel messaggio c'erano doppi asterischi di chiusura, li gestiamo\nmsg.payload.content = msg.payload.content.replace(/<\\/b>\\*/g, \"</b>\"); \n// Nota: siccome il tuo messaggio AI è semplice, la replace sopra è sufficiente per convertire \n// i grassetti che hai messo nel nodo precedente.\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1500,
+        "y": 740,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "559ce50ec0be1fb5",
