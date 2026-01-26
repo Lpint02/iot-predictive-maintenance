@@ -77,13 +77,31 @@ services:
     networks:
       - iot-net
 
+   # Questo container parte, lancia lo script Python e si spegne.
+  dashboard-gen:
+    image: python:3.11-slim
+    container_name: dashboard-generator
+    working_dir: /app
+    volumes:
+      # Montiamo la cartella corrente (.) dentro /app
+      # Così lo script vede templates/, sensors/ e può scrivere in dashboards/
+      - .:/app
+    # Esegue lo script
+    # Non serve rete o porte, lavora solo sui file
+    command: python generate_dashboard.py
+        
+
   # 5. GRAFANA (Dashboard)
   grafana:
     image: grafana/grafana:latest
     container_name: iot-grafana
     restart: always
     depends_on:
-      - influxdb
+      influxdb:
+        condition: service_started
+      # Grafana NON parte finché dashboard-gen non ha finito con successo 
+      dashboard-gen:
+        condition: service_completed_successfully
     ports:
       - "3000:3000"
     volumes:
