@@ -223,24 +223,6 @@
         ]
     },
     {
-        "id": "27d7b569bf9e57e7",
-        "type": "influxdb out",
-        "z": "f6f2187d.f17ca8",
-        "influxdb": "c81978a127dbd6de",
-        "name": "influxdb_machine_telemetry",
-        "measurement": "machine_telemetry",
-        "precision": "",
-        "retentionPolicy": "",
-        "database": "database",
-        "precisionV18FluxV20": "ms",
-        "retentionPolicyV18Flux": "",
-        "org": "${INFLUX_ORG}",
-        "bucket": "${INFLUX_BUCKET}",
-        "x": 1180,
-        "y": 400,
-        "wires": []
-    },
-    {
         "id": "86140135fcf7c2ae",
         "type": "switch",
         "z": "f6f2187d.f17ca8",
@@ -405,24 +387,6 @@
         ]
     },
     {
-        "id": "59f0ddfb08e17f03",
-        "type": "influxdb out",
-        "z": "f6f2187d.f17ca8",
-        "influxdb": "c81978a127dbd6de",
-        "name": "influxdb_ai_predictions",
-        "measurement": "ai_predictions",
-        "precision": "",
-        "retentionPolicy": "",
-        "database": "database",
-        "precisionV18FluxV20": "ms",
-        "retentionPolicyV18Flux": "",
-        "org": "${INFLUX_ORG}",
-        "bucket": "${INFLUX_BUCKET}",
-        "x": 1700,
-        "y": 120,
-        "wires": []
-    },
-    {
         "id": "313b91773e641345",
         "type": "telegram sender",
         "z": "f6f2187d.f17ca8",
@@ -489,6 +453,42 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "27d7b569bf9e57e7",
+        "type": "influxdb out",
+        "z": "f6f2187d.f17ca8",
+        "influxdb": "c81978a127dbd6de",
+        "name": "influxdb_machine_telemetry",
+        "measurement": "machine_telemetry",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "${INFLUX_ORG}",
+        "bucket": "${INFLUX_BUCKET}",
+        "x": 1180,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "59f0ddfb08e17f03",
+        "type": "influxdb out",
+        "z": "f6f2187d.f17ca8",
+        "influxdb": "c81978a127dbd6de",
+        "name": "influxdb_ai_predictions",
+        "measurement": "ai_predictions",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "${INFLUX_ORG}",
+        "bucket": "${INFLUX_BUCKET}",
+        "x": 1700,
+        "y": 120,
+        "wires": []
     },
     {
         "id": "559ce50ec0be1fb5",

@@ -88,6 +88,12 @@ services:
       - "3000:3000"
     volumes:
       - ./grafana/data:/var/lib/grafana
+      # 1. Montiamo il file di configurazione YAML
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      
+      # 2. Montiamo la cartella con i JSON (Template + Generato). Mappa la cartella 'dashboards' (PC) dentro la cartella 'json_files' (Cont
+      # Nota: La destinazione DEVE coincidere con il path scritto nello YAML sopra
+      - ./dashboards:/etc/grafana/provisioning/dashboards/json_files
     networks:
       - iot-net
 
