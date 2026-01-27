@@ -36,7 +36,9 @@ The system follows a modular, layered approach to ensure industrial-grade reliab
 ---
 ## 🧠 Artificial Intelligence & Predictive Maintenance (IPdM)
 This project features an advanced AI module capable of forecasting machinery failure before it occurs. The predictive engine is built on Deep Learning techniques and follows the "Golden Engine" strategy.
-1. **The "Golden Engine" Strategy**
+
+**The "Golden Engine" Strategy**
+
 To overcome the scarcity of real-world failure data, we simulate the complete lifecycle of a motor:
 - **Run-to-Failure Simulation:** The dataset covers the engine's life from optimal conditions to critical failure.
 - **Mathematical Degradation Model:** Wear and tear are modeled using an exponential progression formula: **$$P(t) = (t/L)^E$$**
@@ -44,6 +46,30 @@ To overcome the scarcity of real-world failure data, we simulate the complete li
    - $L$: Maximum expected life of the component.
    - $E$: Severity exponent (controls how fast degradation accelerates).
 - **Noise Injection:** Gaussian noise is applied to the generated features (Vibration, Temperature, Current) to mimic the unpredictability of real physical sensors.
+  
+**LSTM Neural Network Architecture**
+
+The core model is a Long Short-Term Memory (LSTM) Recurrent Neural Network (RNN), specifically designed to detect patterns in time-series data.
+**Data Input**
+- **Sliding Window:** The model analyzes a continuous sequence of the last 50 operating cycles
+- **Features:** Multivariate input consisting of Vibration, Temperature, and Current.
+- **Tensor Shape:** (Batch Size, 50, 3)
+
+**Network Topology**
+
+The model structure (defined in ai_service) is as follows:
+1. **Input Layer:** Accepts the 3D tensor of the sliding window.
+2. **LSTM Layer 1:** 64 units with tanh activation. Captures high-level temporal dependencies.
+3. **Dropout:** 20% (0.2) rate to prevent overfitting.
+4. **LSTM Layer 2:** 32 units with tanh activation. Refines the sequence featur
+5. **Dropout:** 20% (0.2) rate.
+6. **Dense Layer:** 16 units with relu activation.
+7. **Output Layer:** 1 unit with linear activation. Regresses the exact RUL value.
+
+**Integration & Inference**
+- **Training:** Performed offline using the ai_workspace notebooks. The model minimizes the Mean Squared Error (MSE) between the predicted and actual RUL.
+- **Deployment:** The best-performing model (best_rul_model.keras) is containerized in the ai_service.
+- **Real-Time Flow:** Live data from sensors is sent to the AI Service, which computes the RUL and pushes the result back to the MQTT broker or InfluxDB for visualization in Grafana.
 ---
 
 ## 🔧 Configuration & Structure
@@ -62,6 +88,12 @@ The project utilizes a **"Single Source of Truth"** principle for all hardware a
 
 ### Struttura Repository
 ```text
+├── ai_service/         # Real-time Inference Microservice
+│   ├── models/         # Pre-trained .keras models and scalers
+│   └── main.py         # FastAPI/Flask entrypoint for predictions
+├── ai_workspace/       # Offline Development Environment
+│   ├── dataset_gen/    # Scripts for "Golden Engine" data generation
+│   └── training/       # Jupyter Notebooks for LSTM training
 ├── sensors/            # Python Simulator and Digital Twin logic
 |   ├── config/         # sensor_config.json (Centralized parameters)
 |   ├── src/            # Simulator source code and Sensor Factory
