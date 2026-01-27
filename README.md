@@ -31,7 +31,19 @@ The system follows a modular, layered approach to ensure industrial-grade reliab
 4.  **Storage**: **InfluxDB** 2.7 stores time-series data, optimized for high-frequency industrial metrics.
 5.  **Monitoring**: Telegraf monitors hardware performance (CPU/RAM) to ensure container stack stability.
 6.  **HMI (Human-Machine Interface)**: **Grafana** provides interactive dashboards with dynamic variables to filter data by sector, production line, or specific motor.
+7.  **AI Service**: **TensorFlow+Python+FastAPI** specialized microservice for real-time predictive inference (RUL) exposing API throught FastAPI.
 
+---
+## 🧠 Artificial Intelligence & Predictive Maintenance (IPdM)
+This project features an advanced AI module capable of forecasting machinery failure before it occurs. The predictive engine is built on Deep Learning techniques and follows the "Golden Engine" strategy.
+1. **The "Golden Engine" Strategy**
+To overcome the scarcity of real-world failure data, we simulate the complete lifecycle of a motor:
+- **Run-to-Failure Simulation:** The dataset covers the engine's life from optimal conditions to critical failure.
+- **Mathematical Degradation Model:** Wear and tear are modeled using an exponential progression formula: **$$P(t) = (t/L)^E$$**
+   - $P(t)$: Probability of failure/degradation at time $t$.
+   - $L$: Maximum expected life of the component.
+   - $E$: Severity exponent (controls how fast degradation accelerates).
+- **Noise Injection:** Gaussian noise is applied to the generated features (Vibration, Temperature, Current) to mimic the unpredictability of real physical sensors.
 ---
 
 ## 🔧 Configuration & Structure
@@ -102,7 +114,7 @@ docker-compose up -d
 ---
 
 ## 🛠️ Troubleshooting
-- **Dashboard UID Mismatch:** If you import a pre-configured dashboard and see no data, ensure the **Data Source UID** in the dashboard JSON matches the one assigned by Grafana. You can find the correct UID in the **URL** of the InfluxDB data source settings page (e.g., the string after `/edit/`) and manually replace it within the dashboard's JSON model.
+- **Dashboard UID Mismatch:** If you import a pre-configured dashboard and see no data, ensure the **Data Source UID** in the dashboard JSON matches the one assigned by Grafana. You can find the correct UID in the **URL** of the InfluxDB data source settings page (e.g., the string after `/edit/`)
 - **MQTT Connection Refused:** The simulator waits for Mosquitto to be ready. If errors persist, verify the `iot-mosquitto` container status with `docker ps`.
 - **Data missing in Grafana:** Check Node-RED logs for authentication errors. Ensure the `INFLUX_TOKEN` in `.env` matches your InfluxDB setup exactly.
 - **Telegram Alerts not received:** Verify the Bot API Key and ensure you have started a conversation with the bot to obtain the correct `CHAT_ID`.
