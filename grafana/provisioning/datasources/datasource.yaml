@@ -9,11 +9,11 @@ datasources:
     isDefault: true
     
     jsonData:
-      version: Flux        # <--- FONDAMENTALE: Dice a Grafana che è InfluxDB 2.x
-      organization: "univaq" # <--- Sostituisci con il valore di INFLUX_ORG nel tuo .env
-      defaultBucket: "iot_bucket" # <--- Sostituisci con il valore di INFLUX_BUCKET nel .env
+      version: Flux        
+      organization: "univaq" 
+      defaultBucket: "iot_bucket" 
       httpMode: GET
       tlsSkipVerify: true
 
     secureJsonData:
-      token: "ttq6jLWXxhCl9-fZ2BKm1W18fCJNvPoT4lSo4bP7CxB2IPD6IL0Ohy7EQvyM8qyn9d1iyd9OuHA2QbRn8o_cLA==" # <--- Sostituisci con il valore di INFLUX_TOKEN nel tuo .env
+      token: "ttq6jLWXxhCl9-fZ2BKm1W18fCJNvPoT4lSo4bP7CxB2IPD6IL0Ohy7EQvyM8qyn9d1iyd9OuHA2QbRn8o_cLA==" 

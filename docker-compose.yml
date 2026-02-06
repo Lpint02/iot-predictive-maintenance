@@ -88,7 +88,7 @@ services:
       - .:/app
     # Esegue lo script
     # Non serve rete o porte, lavora solo sui file
-    command: python generate_dashboard.py
+    command: python generate_dashboard.py # Esegue lo script
         
 
   # 5. GRAFANA (Dashboard)
@@ -101,16 +101,17 @@ services:
         condition: service_started
       # Grafana NON parte finché dashboard-gen non ha finito con successo 
       dashboard-gen:
-        condition: service_completed_successfully
+        condition: service_completed_successfully 
     ports:
       - "3000:3000"
     volumes:
       - ./grafana/data:/var/lib/grafana
       # 1. Montiamo il file di configurazione YAML
+      # Porta il file YAML da fuori a dentro la cartella che Grafana scansiona all'avvio.
       - ./grafana/provisioning:/etc/grafana/provisioning
       
-      # 2. Montiamo la cartella con i JSON (Template + Generato). Mappa la cartella 'dashboards' (PC) dentro la cartella 'json_files' (Cont
-      # Nota: La destinazione DEVE coincidere con il path scritto nello YAML sopra
+      # 2. Montiamo la cartella con i JSON (Template + Generato). Mappa la cartella 'dashboards' (PC) dentro la cartella 'json_files' (Container)
+      # Nota: La destinazione DEVE coincidere con il path scritto nello YAML di provisioning
       - ./dashboards:/etc/grafana/provisioning/dashboards/json_files
     networks:
       - iot-net

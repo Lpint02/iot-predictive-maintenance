@@ -8,4 +8,4 @@ providers:
     disableDeletion: false
     updateIntervalSeconds: 10   # Controlla modifiche ogni 10 secondi
     options:
-      path: /etc/grafana/provisioning/dashboards/json_files
+      path: /etc/grafana/provisioning/dashboards/json_files # Ignora il database interno, punta alla cartella con i JSON
