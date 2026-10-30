@@ -172,6 +172,6 @@ docker-compose up -d
 
 Project for the Software Engineering for IoT course, University of L'Aquila (Dec 2025 – Feb 2026). Team of 3.
 
-- **Alessio Torrieri** ([@flebo45](https://github.com/flebo45)): AI module — LSTM model in Keras and training notebooks, FastAPI inference service, Node-RED flow that writes the predictions to InfluxDB, time-series database management.
-- **[@Lpint02](https://github.com/Lpint02)**: _to be completed_
-- **[@smasherone2001](https://github.com/smasherone2001)**: _to be completed_
+- **Alessio Torrieri** ([@flebo45](https://github.com/flebo45))
+- **[@Lpint02](https://github.com/Lpint02)**
+- **[@smasherone2001](https://github.com/smasherone2001)**
