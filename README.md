@@ -70,6 +70,10 @@ The model structure (defined in ai_service) is as follows:
 - **Training:** Performed offline using the ai_workspace notebooks. The model minimizes the Mean Squared Error (MSE) between the predicted and actual RUL.
 - **Deployment:** The best-performing model (best_rul_model.keras) is containerized in the ai_service.
 - **Real-Time Flow:** Live data from sensors is sent to the AI Service, which computes the RUL and pushes the result back to the MQTT broker or InfluxDB for visualization in Grafana.
+
+**Results**
+- On the test set the model reaches a **MAE of about 160 cycles**, on simulated lifetimes between 800 and 2,000 cycles.
+- The data is **synthetic** (generated with the degradation model above): the number shows that the pipeline works end to end, not how the model would perform on real motors.
 ---
 
 ## 🔧 Configuration & Structure
@@ -86,7 +90,7 @@ The project utilizes a **"Single Source of Truth"** principle for all hardware a
 | `templates` | Sets Warning/Critical thresholds (e.g., ISO 10816) and base values. |
 | `simulation` | Manages transmission intervals and failure probabilities. |
 
-### Struttura Repository
+### Repository Structure
 ```text
 ├── ai_service/         # Real-time Inference Microservice
 │   ├── models/         # Pre-trained .keras models and scalers
@@ -109,19 +113,19 @@ The project utilizes a **"Single Source of Truth"** principle for all hardware a
 
 ### Prerequisites
 - Docker & Docker Compose installed.
-- Acces to a terminal with `git`.
+- Access to a terminal with `git`.
 
 ### Telegram Bot Configuration
 To receive real-time industrial alerts, follow these steps:
 1. **Create the Bot:** Search for `@BotFather` on Telegram. Send `/newbot` and follow the instructions to get your **API Token**.
 2. **Create Alert Groups**: Create 2 separate groups (e.g., "Sector 1 Alerts" and "Sector 2 Alerts").
-3.**Get Chat IDs:** Add your bot to these groups. To find the group ID, add a bot like `@IDBot` or `@userinfobot` to the group, or use the Telegram API: `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates.`
+3. **Get Chat IDs:** Add your bot to these groups. To find the group ID, add a bot like `@IDBot` or `@userinfobot` to the group, or use the Telegram API: `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates.`
 4. **Update** `.env`: Insert the `TELEGRAM_TOKEN` and the `CHAT_ID` for each sector/group in your `.env` file.
    
 ### Launch the Stack
 - **Clone the repository**
 ```bash
-git clone https://github.com/your-username/iot-predictive-maintenance.git
+git clone https://github.com/Lpint02/iot-predictive-maintenance.git
 cd iot-predictive-maintenance
 ```
 - **Configure Environment:**
@@ -162,11 +166,12 @@ docker-compose up -d
 - [mattpaol441](https://github.com/mattpaol441)
 ---
 
+---
 
+## 👥 Team
 
+Project for the Software Engineering for IoT course, University of L'Aquila (Dec 2025 – Feb 2026). Team of 3.
 
-
-
-
-
-
+- **Alessio Torrieri** ([@flebo45](https://github.com/flebo45)): AI module — LSTM model in Keras and training notebooks, FastAPI inference service, Node-RED flow that writes the predictions to InfluxDB, time-series database management.
+- **[@Lpint02](https://github.com/Lpint02)**: _to be completed_
+- **[@smasherone2001](https://github.com/smasherone2001)**: _to be completed_
